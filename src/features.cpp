@@ -1,5 +1,7 @@
 #include <iostream>
 #include <math.h>
+#include <string.h>
+#include <typeinfo>
 #include "features.hpp"
 
 int Analysis::orbit_2d(Maps_2d* map)

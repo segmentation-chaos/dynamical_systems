@@ -4,6 +4,7 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 ## Current maps
 * Hénon
 * Standard
+* Standard nontwist 
 
 ## Features
 * Orbit 

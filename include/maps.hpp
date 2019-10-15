@@ -13,8 +13,8 @@ class Maps_2d
         string name = "map_base_class";
     public:
         double out[2], in[2]; 
-        virtual string check_id(){return name;}
-        virtual int evolve(){return 0;};
+        virtual string check_id(){ return name; }
+        virtual int evolve(){ return 0; };
 };
 
 class Std_map : public Maps_2d
@@ -23,7 +23,7 @@ class Std_map : public Maps_2d
         string name = "standard_map";
     public:
         double par;
-        string check_id(){return name;}
+        string check_id(){ return name; }
         int evolve();
 };
 
@@ -33,7 +33,17 @@ class Hen_map : public Maps_2d
         string name = "henon_map";
     public:
         double par[2];
-        string check_id(){return name;}
+        string check_id(){ return name; }
+        int evolve();
+};
+
+class Ntwst_map : public Maps_2d
+{
+    private:
+        string name = "nontwist_std_map";
+    public:
+        double par[3];
+        string check_id(){ return name; }
         int evolve();
 };
 

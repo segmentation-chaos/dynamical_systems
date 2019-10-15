@@ -6,16 +6,21 @@
 
 int Analysis::orbit_2d(Maps_2d* map)
 {
+    /**
+    * Receives a map for orbit calculation.
+    * Return: FILE: Orbit points (map_id/orbit.dat)
+    *         FILE: Initial condition (map_id/orbit_ic.dat)
+    */ 
     FILE *fout1, *fout2;
     if(map->check_id() == 1)
     {
-        fout1 = fopen("results/standard_map/orbit.dat","w");
-        fout2 = fopen("results/standard_map/orbit_ic.dat","w");
+        fout1 = fopen("results/standard_map/orbit.dat", "w");
+        fout2 = fopen("results/standard_map/orbit_ic.dat", "w");
     }
     else if(map->check_id() == 2)
     {
-        fout1 = fopen("results/henon_map/orbit.dat","w");
-        fout2 = fopen("results/henon_map/orbit_ic.dat","w");
+        fout1 = fopen("results/henon_map/orbit.dat", "w");
+        fout2 = fopen("results/henon_map/orbit_ic.dat", "w");
     }
     else
     {
@@ -39,16 +44,21 @@ int Analysis::orbit_2d(Maps_2d* map)
 
 int Analysis::phase_space_2d(Maps_2d* map)
 {
+    /**
+    * Receives a map for phase space calculation.
+    * Return: FILE: Phase space points (map_id/phase_space.dat)
+    *         FILE: Set of initial conditions (map_id/phase_space_ic.dat)
+    */
     FILE *fout1, *fout2;
     if(map->check_id() == 1)
     {
-        fout1 = fopen("results/standard_map/phase_space.dat","w");
-        fout2 = fopen("results/standard_map/phase_space_ic.dat","w");
+        fout1 = fopen("results/standard_map/phase_space.dat", "w");
+        fout2 = fopen("results/standard_map/phase_space_ic.dat", "w");
     }
     else if(map->check_id() == 2)
     {
-        fout1 = fopen("results/henon_map/phase_space.dat","w");
-        fout2 = fopen("results/henon_map/phase_space_ic.dat","w");
+        fout1 = fopen("results/henon_map/phase_space.dat", "w");
+        fout2 = fopen("results/henon_map/phase_space_ic.dat", "w");
     }
     else
     {

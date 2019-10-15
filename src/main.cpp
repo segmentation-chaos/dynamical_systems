@@ -12,10 +12,12 @@ int main(int argc, char **argv)
 	map_1 = &std;
 	map_2 = &hen;
 
+	/* Map settings */
 	std.par = 1.5;
 	hen.par[0] = 1.4;
 	hen.par[1] = 0.3;
 
+	/* Orbit settings */
 	Analysis orb_1, orb_2;
 
 	orb_1.x0 = 0.9;
@@ -28,10 +30,12 @@ int main(int argc, char **argv)
 	orb_2.iter_num = 1e5;
 	orb_2.orbit_2d(map_2);
 
+	/* Map settings */
 	std.par = 1.5;
 	hen.par[0] = 0.3;
 	hen.par[1] = 1.0;
 
+	/* Phase space settings*/
 	Analysis ps_1, ps_2;
 
 	ps_1.x_min = 0.0;

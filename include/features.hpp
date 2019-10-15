@@ -1,6 +1,8 @@
 #ifndef FEATURES_H
 #define FEATURES_H
 
+#include <typeinfo>
+
 #include "maps.hpp"
 
 class Analysis

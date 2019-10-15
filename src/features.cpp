@@ -1,7 +1,3 @@
-#include <iostream>
-#include <math.h>
-#include <string.h>
-#include <typeinfo>
 #include "features.hpp"
 
 int Analysis::orbit_2d(Maps_2d* map)
@@ -12,21 +8,14 @@ int Analysis::orbit_2d(Maps_2d* map)
     *         FILE: Initial condition (map_id/orbit_ic.dat)
     */ 
     FILE *fout1, *fout2;
-    if(map->check_id() == 1)
-    {
-        fout1 = fopen("results/standard_map/orbit.dat", "w");
-        fout2 = fopen("results/standard_map/orbit_ic.dat", "w");
-    }
-    else if(map->check_id() == 2)
-    {
-        fout1 = fopen("results/henon_map/orbit.dat", "w");
-        fout2 = fopen("results/henon_map/orbit_ic.dat", "w");
-    }
-    else
-    {
-        std::cout << "Invalid map type." << std::endl;
-        exit(2);
-    }
+
+    string base_dir = "results/";
+    string fl_orbit = "/orbit.dat";
+    string fl_orbit_ic = "/orbit_ic.dat";
+
+    fout1 = fopen((base_dir + map->check_id() + fl_orbit).c_str(), "w");
+    fout2 = fopen((base_dir + map->check_id() + fl_orbit_ic).c_str(), "w");
+    
     fprintf(fout2, "%f %f\n", x0, y0);
    	map->in[0] = x0;
 	map->in[1] = y0;
@@ -50,21 +39,14 @@ int Analysis::phase_space_2d(Maps_2d* map)
     *         FILE: Set of initial conditions (map_id/phase_space_ic.dat)
     */
     FILE *fout1, *fout2;
-    if(map->check_id() == 1)
-    {
-        fout1 = fopen("results/standard_map/phase_space.dat", "w");
-        fout2 = fopen("results/standard_map/phase_space_ic.dat", "w");
-    }
-    else if(map->check_id() == 2)
-    {
-        fout1 = fopen("results/henon_map/phase_space.dat", "w");
-        fout2 = fopen("results/henon_map/phase_space_ic.dat", "w");
-    }
-    else
-    {
-        std::cout << "Invalid map type." << std::endl;
-        exit(2);
-    }
+    
+    string base_dir = "results/";
+    string fl_phsp = "/phase_space.dat";
+    string fl_phsp_ic = "/phase_space_ic.dat";
+
+    fout1 = fopen((base_dir + map->check_id() + fl_phsp).c_str(), "w");
+    fout2 = fopen((base_dir + map->check_id() + fl_phsp_ic).c_str(), "w");
+    
     iter_num = 1000;
     double x, y;
     double delta_x = fabs(x_max - x_min) / ((double) num_x);

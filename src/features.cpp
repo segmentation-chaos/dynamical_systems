@@ -17,6 +17,11 @@ int Analysis::orbit_2d(Maps_2d* map)
         fout1 = fopen("results/henon_map/orbit.dat","w");
         fout2 = fopen("results/henon_map/orbit_ic.dat","w");
     }
+    else if(map->check_id() == 10)
+    {
+        fout1 = fopen("results/halley_map/orbit.dat","w");
+        fout2 = fopen("results/halley_map/orbit_ic.dat","w");
+    }
     else
     {
         std::cout << "Invalid map type." << std::endl;
@@ -49,6 +54,11 @@ int Analysis::phase_space_2d(Maps_2d* map)
     {
         fout1 = fopen("results/henon_map/phase_space.dat","w");
         fout2 = fopen("results/henon_map/phase_space_ic.dat","w");
+    }
+    else if(map->check_id() == 10)
+    {
+        fout1 = fopen("results/halley_map/phase_space.dat","w");
+        fout2 = fopen("results/halley_map/phase_space_ic.dat","w");
     }
     else
     {

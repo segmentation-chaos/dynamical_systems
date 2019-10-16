@@ -10,7 +10,7 @@ int main(int argc, char **argv)
 	
 	Std_map std;
 	Hen_map hen;
-	Ntwst_map ntwst;
+	Std_ntwist_map ntwst;
 	Hal_map hal;
 	map_1 = &std;
 	map_2 = &hen;

@@ -17,10 +17,10 @@ class Maps_2d
         virtual int evolve(){ return 0; };
 };
 
-class Std_map : public Maps_2d
+class Hal_map : public Maps_2d
 {
     private:
-        string name = "standard_map";
+        string name = "halley_map";
     public:
         double par;
         string check_id(){ return name; }
@@ -37,22 +37,22 @@ class Hen_map : public Maps_2d
         int evolve();
 };
 
-class Ntwst_map : public Maps_2d
+class Std_map : public Maps_2d
 {
     private:
-        string name = "nontwist_std_map";
+        string name = "standard_map";
     public:
-        double par[3];
+        double par;
         string check_id(){ return name; }
         int evolve();
 };
 
-class Hal_map : public Maps_2d
+class Std_ntwist_map : public Maps_2d
 {
     private:
-        string name = "halley_map";
+        string name = "std_nontwist_map";
     public:
-        double par;
+        double par[3];
         string check_id(){ return name; }
         int evolve();
 };

@@ -1,4 +1,4 @@
-	INCLUDE_DIR=./include
+INCLUDE_DIR=./include
 CXXFLAGS=-Wall -I$(INCLUDE_DIR) #-Werror -O3
 VPATH=./src
 

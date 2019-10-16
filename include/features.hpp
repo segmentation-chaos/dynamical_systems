@@ -2,6 +2,7 @@
 #define FEATURES_H
 
 #include <typeinfo>
+#include <sys/stat.h>
 
 #include "maps.hpp"
 
@@ -13,6 +14,8 @@ class Analysis
         double x_min, x_max, y_min, y_max, num_x, num_y;
         int orbit_2d(Maps_2d*);
         int phase_space_2d(Maps_2d*);
+        int make_dir(string, string);
+        int make_file(FILE**, FILE**, string, string);
 };
 
 #endif

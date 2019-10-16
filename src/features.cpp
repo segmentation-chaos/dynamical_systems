@@ -1,5 +1,38 @@
 #include "features.hpp"
 
+int Analysis::make_dir(string base_dir, string map_name)
+{
+    /* Create folder (if not existent) */
+    if (-1 == mkdir((base_dir).c_str(), 
+        S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+    {
+        // Error call
+    }
+    else
+    {
+        cout << "Folder created " + base_dir << endl;
+    }
+    
+    if (-1 ==  mkdir((base_dir + map_name).c_str(),
+        S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) 
+    {
+        // Error call
+    }
+    else 
+    {
+        cout << "Folder created " + base_dir + map_name << endl;
+    }
+    
+    return 0;
+}
+
+int Analysis::make_file(FILE **fout1, FILE **fout2, string dir, string anal_type)
+{
+    *fout1 = fopen((dir + "/" + anal_type + ".dat").c_str(), "w");
+    *fout2 = fopen((dir + "/" + anal_type + "_ic.dat").c_str(), "w");
+    return 0;
+}
+
 int Analysis::orbit_2d(Maps_2d* map)
 {
     /**
@@ -8,14 +41,12 @@ int Analysis::orbit_2d(Maps_2d* map)
     *         FILE: Initial condition (map_id/orbit_ic.dat)
     */ 
     FILE *fout1, *fout2;
-
     string base_dir = "results/";
-    string fl_orbit = "/orbit.dat";
-    string fl_orbit_ic = "/orbit_ic.dat";
+    string fl_type = "orbit";
 
-    fout1 = fopen((base_dir + map->check_id() + fl_orbit).c_str(), "w");
-    fout2 = fopen((base_dir + map->check_id() + fl_orbit_ic).c_str(), "w");
-    
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
+
     fprintf(fout2, "%f %f\n", x0, y0);
    	map->in[0] = x0;
 	map->in[1] = y0;
@@ -39,13 +70,11 @@ int Analysis::phase_space_2d(Maps_2d* map)
     *         FILE: Set of initial conditions (map_id/phase_space_ic.dat)
     */
     FILE *fout1, *fout2;
-    
     string base_dir = "results/";
-    string fl_phsp = "/phase_space.dat";
-    string fl_phsp_ic = "/phase_space_ic.dat";
+    string fl_type = "phase_space";
 
-    fout1 = fopen((base_dir + map->check_id() + fl_phsp).c_str(), "w");
-    fout2 = fopen((base_dir + map->check_id() + fl_phsp_ic).c_str(), "w");
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
     
     iter_num = 1000;
     double x, y;

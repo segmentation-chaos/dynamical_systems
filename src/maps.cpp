@@ -1,6 +1,4 @@
 #include "maps.hpp"
-#include <math.h>
-#include <iostream>
 
 int Std_map::evolve()
 {

@@ -1,8 +1,37 @@
-#include <iostream>
-#include <math.h>
-#include <string.h>
-#include <typeinfo>
 #include "features.hpp"
+
+int Analysis::make_dir(string base_dir, string map_name)
+{
+    /* Create folder (if not existent) */
+    if (-1 == mkdir((base_dir).c_str(), 
+        S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH))
+    {
+        // Error call
+    }
+    else
+    {
+        cout << "Folder created " + base_dir << endl;
+    }
+    
+    if (-1 ==  mkdir((base_dir + map_name).c_str(),
+        S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH)) 
+    {
+        // Error call
+    }
+    else 
+    {
+        cout << "Folder created " + base_dir + map_name << endl;
+    }
+    
+    return 0;
+}
+
+int Analysis::make_file(FILE **fout1, FILE **fout2, string dir, string anal_type)
+{
+    *fout1 = fopen((dir + "/" + anal_type + ".dat").c_str(), "w");
+    *fout2 = fopen((dir + "/" + anal_type + "_ic.dat").c_str(), "w");
+    return 0;
+}
 
 int Analysis::orbit_2d(Maps_2d* map)
 {
@@ -12,21 +41,12 @@ int Analysis::orbit_2d(Maps_2d* map)
     *         FILE: Initial condition (map_id/orbit_ic.dat)
     */ 
     FILE *fout1, *fout2;
-    if(map->check_id() == 1)
-    {
-        fout1 = fopen("results/standard_map/orbit.dat", "w");
-        fout2 = fopen("results/standard_map/orbit_ic.dat", "w");
-    }
-    else if(map->check_id() == 2)
-    {
-        fout1 = fopen("results/henon_map/orbit.dat", "w");
-        fout2 = fopen("results/henon_map/orbit_ic.dat", "w");
-    }
-    else
-    {
-        std::cout << "Invalid map type." << std::endl;
-        exit(2);
-    }
+    string base_dir = "results/";
+    string fl_type = "orbit";
+
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
+
     fprintf(fout2, "%f %f\n", x0, y0);
    	map->in[0] = x0;
 	map->in[1] = y0;
@@ -50,21 +70,12 @@ int Analysis::phase_space_2d(Maps_2d* map)
     *         FILE: Set of initial conditions (map_id/phase_space_ic.dat)
     */
     FILE *fout1, *fout2;
-    if(map->check_id() == 1)
-    {
-        fout1 = fopen("results/standard_map/phase_space.dat", "w");
-        fout2 = fopen("results/standard_map/phase_space_ic.dat", "w");
-    }
-    else if(map->check_id() == 2)
-    {
-        fout1 = fopen("results/henon_map/phase_space.dat", "w");
-        fout2 = fopen("results/henon_map/phase_space_ic.dat", "w");
-    }
-    else
-    {
-        std::cout << "Invalid map type." << std::endl;
-        exit(2);
-    }
+    string base_dir = "results/";
+    string fl_type = "phase_space";
+
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
+    
     iter_num = 1000;
     double x, y;
     double delta_x = fabs(x_max - x_min) / ((double) num_x);

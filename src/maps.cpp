@@ -57,3 +57,21 @@ int Ntwst_map::evolve()
     }
     return 0;
 }
+
+int Hal_map::evolve()
+{
+    /**
+     * Halley map as Eq. 36 of Shevchenko (2011)
+     * 
+     * y_{n+1} = y_{n} + sin x_{n}
+     * x_{n+1} = x_{n} + \lambda * |y_{n+1}|^{-3/2}
+     * 
+     */
+    out[1] = in[1] + sin(in[0]);
+    out[0] = fmod(in[0] + par * pow(fabs(out[1]), -1.5), 2.*M_PI);
+    if (out[0] < 0.0)
+    {
+        out[0] += 2.0 * M_PI;
+    }
+    return 0;
+}

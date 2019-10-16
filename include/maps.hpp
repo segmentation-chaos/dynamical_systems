@@ -47,4 +47,14 @@ class Ntwst_map : public Maps_2d
         int evolve();
 };
 
+class Hal_map : public Maps_2d
+{
+    private:
+        string name = "halley_map";
+    public:
+        double par;
+        string check_id(){ return name; }
+        int evolve();
+};
+
 #endif

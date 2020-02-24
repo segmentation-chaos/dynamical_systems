@@ -114,7 +114,11 @@ int main(int argc, char **argv)
 	int running = 1;
 	const int SCR_WIDTH = 1000;
 	const int SCR_HEIGHT = 800;
-	System sys(SCR_WIDTH, SCR_HEIGHT, map_4, ps_4);
+	System sys(SCR_WIDTH, SCR_HEIGHT, map_1, ps_1);
+
+	// Set new map and Analysis features (x,y limits)
+	sys.setMap(map_3);
+	sys.setAnalysis(ps_3);
 
 	while (running)
 	{

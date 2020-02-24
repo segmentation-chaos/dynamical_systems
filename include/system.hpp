@@ -16,7 +16,7 @@ class System
                 Maps_2d *map_type, Analysis anal_type);
 
         void setMap(Maps_2d *map_in);
-        // void setAnalysis(Analysis anal_in); -- arrumar
+        void setAnalysis(Analysis anal_in);
 
         int run();
 };

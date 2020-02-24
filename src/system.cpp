@@ -277,7 +277,21 @@ void System::setMap(Maps_2d *map_in)
     map = map_in;
 }
 
-// void System::setAnalysis(Analysis anal_in)
-// {
-    // analy = &anal_in;
-// }
+void System::setAnalysis(Analysis anal_in)
+{
+    // x0; y0; iter_num omitted since are not used 
+    analy->x_min = anal_in.x_min;
+    analy->x_max = anal_in.x_max;
+    analy->y_min = anal_in.y_min;
+    analy->y_max = anal_in.y_max;
+
+    // Set system coordinates to map
+    canvas.sX_min = analy->x_min;
+    canvas.sX_max = analy->x_max;
+    canvas.sY_min = analy->y_min;
+    canvas.sY_max = analy->y_max;
+    canvas.sX_scl_min = canvas.sX_min;
+    canvas.sX_scl_max = canvas.sX_max;
+    canvas.sY_scl_min = canvas.sY_min;
+    canvas.sY_scl_max = canvas.sY_max;
+}

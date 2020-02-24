@@ -20,9 +20,9 @@ System::System(unsigned int scrWidth, unsigned int scrHeight,
     canvas.sY_scl_min = canvas.sY_min;
     canvas.sY_scl_max = canvas.sY_max;
 
+    // Allocate vectors
     canvas.orb_pts.resize(2, vector<double>(0));
-
-    cout << map->check_id() << endl;
+    canvas.line_orb.resize(2, vector<double>(0));
 }
 
 int System::run()
@@ -88,9 +88,49 @@ int System::run()
                 canvas.line_hold = false;
                 canvas.line_quit = true;
             }
+            else if (canvas.cEvent.key.keysym.sym == SDLK_e && canvas.line_hold)
+            {
+                SDL_GetMouseState(&canvas.line_cX_b, &canvas.line_cY_b);
+                double versor[2];
+
+                // Allocates line points in a vector
+                if (canvas.line_pts != 0)
+                {
+                    versor[0] = (canvas.line_cX_b - canvas.line_cX_a) / (double) canvas.line_pts;
+                    versor[1] = (canvas.line_cY_b - canvas.line_cY_a) / (double) canvas.line_pts;
+
+                    for (int i = 0; i <= canvas.line_pts; i++)
+                    {
+                        canvas.cX = canvas.line_cX_a + (int) ((double) i * versor[0]);
+                        canvas.cY = canvas.line_cY_a + (int) ((double) i * versor[1]);
+                        canvas.drawPhasePoint();
+                        canvas.CanvasToSystem();
+                        canvas.line_orb[0].push_back(canvas.sX);
+                        canvas.line_orb[1].push_back(canvas.sY);
+                    }
+                }
+                else if (canvas.line_pts == 0)
+                {
+                    canvas.cX = canvas.line_cX_a;
+                    canvas.cY = canvas.line_cY_a;
+                    canvas.drawPhasePoint();
+                    canvas.CanvasToSystem();
+                    canvas.line_orb[0].push_back(canvas.sX);
+                    canvas.line_orb[1].push_back(canvas.sY);
+
+                    canvas.cX = canvas.line_cX_b;
+                    canvas.cY = canvas.line_cY_b;
+                    canvas.drawPhasePoint();
+                    canvas.CanvasToSystem();
+                    canvas.line_orb[0].push_back(canvas.sX);
+                    canvas.line_orb[1].push_back(canvas.sY);
+                }
+                
+                canvas.line_run = true;
+            }
 
             // Init. cond. line points density
-            if (canvas.cEvent.type == SDL_MOUSEWHEEL)
+            if (canvas.cEvent.type == SDL_MOUSEWHEEL && canvas.line_hold)
             {
                 if (canvas.cEvent.wheel.y > 0) 
                 {
@@ -113,7 +153,7 @@ int System::run()
 
         
         // Run dynamical step
-        if (canvas.mouse_hold) 
+        if (canvas.mouse_hold && !canvas.line_run) 
         {
             map->evolve();
 
@@ -162,19 +202,59 @@ int System::run()
         }
 
         // Draw Init. Cond. Line
-        if (canvas.line_hold)
+        if (canvas.line_hold && !canvas.line_run)
         {
             canvas.clear();
             canvas.drawOrbit();
             SDL_GetMouseState(&canvas.line_cX_b, &canvas.line_cY_b);
             canvas.drawLine();
         }
-        else if (canvas.line_quit)
+        else if (canvas.line_quit && !canvas.line_run)
         {
             canvas.clear();
             canvas.drawOrbit();
             // canvas.line_run = true;
             canvas.line_quit = false;
+        }
+        else if (canvas.line_run)
+        {
+            // Run dynamics for points in line
+            if (canvas.line_iter < canvas.line_iter_max)
+            {
+                for (unsigned int p = 0; p < canvas.line_orb[0].size(); p++)
+                {
+                    map->in[0] = canvas.line_orb[0][p];
+                    map->in[1] = canvas.line_orb[1][p];
+
+                    map->evolve();
+                    
+                    canvas.sX = map->out[0];
+                    canvas.sY = map->out[1];  
+
+                    canvas.SystemToCanvas();
+                    canvas.drawPhasePoint();
+
+                    canvas.orb_pts[0].push_back(canvas.sX);                  
+                    canvas.orb_pts[1].push_back(canvas.sY);
+
+                    canvas.line_orb[0][p] = canvas.sX;
+                    canvas.line_orb[1][p] = canvas.sY;                    
+                }
+                canvas.line_iter += 1;
+            }
+            else
+            {
+
+                canvas.line_orb[0].clear();
+                canvas.line_orb[1].clear();
+
+                canvas.clear();
+                canvas.drawOrbit();
+                canvas.line_iter = 0;
+                canvas.line_run = false;
+                canvas.line_quit = true;
+                canvas.line_hold = false;
+            }
         }
 
         canvas.show();

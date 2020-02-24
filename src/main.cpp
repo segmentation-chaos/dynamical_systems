@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	int running = 1;
 	const int SCR_WIDTH = 1000;
 	const int SCR_HEIGHT = 800;
-	System sys(SCR_WIDTH, SCR_HEIGHT, map_2, ps_2);
+	System sys(SCR_WIDTH, SCR_HEIGHT, map_4, ps_4);
 
 	while (running)
 	{

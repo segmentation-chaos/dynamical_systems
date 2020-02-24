@@ -56,6 +56,7 @@ class Canvas
 
         // Orbit points
         vector<vector<double>> orb_pts;
+        vector<vector<double>> line_orb;
 
         // Canvas coordinates
         int cX;
@@ -97,6 +98,8 @@ class Canvas
         
         int line_pts = 0;
         int max_line_pts = 50;
+        int line_iter = 0;
+        int line_iter_max = 1e4;
 
         // Drawing colors
         Uint8 lineR = 255;

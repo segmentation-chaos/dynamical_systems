@@ -11,3 +11,12 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 ## Features
 * Orbit 
 * Phase space
+* Interactive phase space (clickSpace)
+
+## ClickSpace commands
+* Left click (hold): run orbit for click initial point
+* Right click (hold): open zoom window (zoom in when released)
+* c: total zoom out
+* r: creates initial condition line
+* s: destroy initial condition line
+* Scrool up|down: increases|decreases the number of points in initial condition line

@@ -4,11 +4,11 @@ VPATH=./src
 
 TARGETS=dyn_sys
 
-DEPENDENCIES=main.cpp maps.cpp features.cpp
+DEPENDENCIES=main.cpp maps.cpp features.cpp canvas.cpp system.cpp
 
 build: $(TARGETS)
 
-$(TARGETS): $(DEPENDENCIES)
+$(TARGETS): $(DEPENDENCIES) -lSDL2
 	$(CXX) $(CXXFLAGS) -o dyn_sys $^
 
 .PHONY: clean

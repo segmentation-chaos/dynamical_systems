@@ -1,8 +1,11 @@
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
+
+#include "canvas.hpp"
 #include "maps.hpp"
 #include "features.hpp"
+#include "system.hpp"
 
 int main(int argc, char **argv)
 {
@@ -73,10 +76,10 @@ int main(int argc, char **argv)
 	ps_1.num_y = 10;
 	ps_1.phase_space_2d(map_1);
 
-	ps_2.x_min = -1.2;
-	ps_2.x_max = 1.2;
-	ps_2.y_min = -1.2;
-	ps_2.y_max = 1.2;
+	ps_2.x_min = -2.0;
+	ps_2.x_max = 2.0;
+	ps_2.y_min = -2.0;
+	ps_2.y_max = 2.0;
 	ps_2.num_x = 20;
 	ps_2.num_y = 20;
 	ps_2.phase_space_2d(map_2);
@@ -97,6 +100,7 @@ int main(int argc, char **argv)
 	ps_4.num_y = 10;
 	ps_4.phase_space_2d(map_4);
 
+
 	ps_5.x_min = 0.0;
 	ps_5.x_max = 2.0 * M_PI;
 	ps_5.y_min = 0.0;
@@ -104,6 +108,22 @@ int main(int argc, char **argv)
 	ps_5.num_x = 10;
 	ps_5.num_y = 10;
 	ps_5.phase_space_2d(map_5);
+
+
+	/*** ClickSpace application ***/
+	int running = 1;
+	const int SCR_WIDTH = 1000;
+	const int SCR_HEIGHT = 800;
+	System sys(SCR_WIDTH, SCR_HEIGHT, map_1, ps_1);
+
+	// Set new map and Analysis features (x,y limits)
+	sys.setMap(map_3);
+	sys.setAnalysis(ps_3);
+
+	while (running)
+	{
+		running = sys.run();
+	} 
 
 	return 0;
 }

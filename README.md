@@ -4,6 +4,7 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 ## Current maps
 * Halley
 * Hénon
+* Simplified Fermi-Ulam model
 * Standard
 * Standard nontwist 
 

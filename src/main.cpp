@@ -6,28 +6,31 @@
 
 int main(int argc, char **argv)
 {
-	Maps_2d *map_1, *map_2, *map_3, *map_4;
+	Maps_2d *map_1, *map_2, *map_3, *map_4, *map_5;
 	
 	Std_map std;
 	Hen_map hen;
 	Std_ntwist_map ntwst;
 	Hal_map hal;
+	Sfum_map sfum;
 	map_1 = &std;
 	map_2 = &hen;
 	map_3 = &ntwst;
 	map_4 = &hal;
+	map_5 = &sfum;
 
 	/* Map settings */
-	std.par = 1.5;
+	std.par[0] = 1.5;
 	hen.par[0] = 1.4;
 	hen.par[1] = 0.3;
 	ntwst.par[0] = 0.515;
 	ntwst.par[1] = 0.4;
 	ntwst.par[2] = 2.0;
-	hal.par = 20.;
+	hal.par[0] = 20.;
+	sfum.par[0] = 0.001;
 
 	/* Orbit settings */
-	Analysis orb_1, orb_2, orb_3, orb_4;
+	Analysis orb_1, orb_2, orb_3, orb_4, orb_5;
 
 	orb_1.x0 = 0.9;
 	orb_1.y0 = 0.0;
@@ -49,13 +52,18 @@ int main(int argc, char **argv)
 	orb_4.iter_num = 1e5;
 	orb_4.orbit_2d(map_4);
 
+	orb_5.x0 = 3.14;
+	orb_5.y0 = 0.01;
+	orb_5.iter_num = 1e4;
+	orb_5.orbit_2d(map_5);
+
 	/* Map settings */
-	std.par = 1.5;
+	std.par[0] = 1.5;
 	hen.par[0] = 0.3;
 	hen.par[1] = 1.0;
 
 	/* Phase space settings*/
-	Analysis ps_1, ps_2, ps_3, ps_4;
+	Analysis ps_1, ps_2, ps_3, ps_4, ps_5;
 
 	ps_1.x_min = 0.0;
 	ps_1.x_max = 1.0;
@@ -88,6 +96,14 @@ int main(int argc, char **argv)
 	ps_4.num_x = 10;
 	ps_4.num_y = 10;
 	ps_4.phase_space_2d(map_4);
+
+	ps_5.x_min = 0.0;
+	ps_5.x_max = 2.0 * M_PI;
+	ps_5.y_min = 0.0;
+	ps_5.y_max = 0.2;
+	ps_5.num_x = 10;
+	ps_5.num_y = 10;
+	ps_5.phase_space_2d(map_5);
 
 	return 0;
 }

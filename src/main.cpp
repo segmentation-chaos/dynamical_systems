@@ -26,9 +26,9 @@ int main(int argc, char **argv)
 	std.par[0] = 1.5;
 	hen.par[0] = 1.4;
 	hen.par[1] = 0.3;
-	ntwst.par[0] = 0.515;
+	ntwst.par[0] = 0.615;
 	ntwst.par[1] = 0.4;
-	ntwst.par[2] = 2.0;
+	ntwst.par[2] = 2;
 	hal.par[0] = 20.;
 	sfum.par[0] = 0.001;
 
@@ -100,7 +100,6 @@ int main(int argc, char **argv)
 	ps_4.num_y = 10;
 	ps_4.phase_space_2d(map_4);
 
-
 	ps_5.x_min = 0.0;
 	ps_5.x_max = 2.0 * M_PI;
 	ps_5.y_min = 0.0;
@@ -109,16 +108,28 @@ int main(int argc, char **argv)
 	ps_5.num_y = 10;
 	ps_5.phase_space_2d(map_5);
 
+	/* Winding number */
+	Analysis wnd_3;
 
+	wnd_3.wind_x0 = 0.0;
+	wnd_3.wind_xf = 0.0;
+	wnd_3.wind_y0 = -0.3;	
+	wnd_3.wind_yf = 0.2;
+	wnd_3.pts_num = 800;
+	wnd_3.winding_number(map_3);
+
+
+	/******************************/
 	/*** ClickSpace application ***/
+	/******************************/
 	int running = 1;
 	const int SCR_WIDTH = 1000;
 	const int SCR_HEIGHT = 800;
 	System sys(SCR_WIDTH, SCR_HEIGHT, map_1, ps_1);
 
 	// Set new map and Analysis features (x,y limits)
-	sys.setMap(map_3);
-	sys.setAnalysis(ps_3);
+	sys.setMap(map_1);
+	sys.setAnalysis(ps_1);
 
 	while (running)
 	{

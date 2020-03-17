@@ -12,6 +12,7 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 * Orbit 
 * Phase space
 * Interactive phase space (clickSpace)
+* Winding number
 
 ## ClickSpace commands
 * Left click (hold): run orbit for click initial point

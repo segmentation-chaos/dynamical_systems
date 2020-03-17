@@ -9,10 +9,15 @@ int Hal_map::evolve()
      */
     out[1] = in[1] + sin(in[0]);
     out[0] = fmod(in[0] + par[0] * pow(fabs(out[1]), -1.5), 2.*M_PI);
-    if (out[0] < 0.0)
+    
+    if (mod)
     {
-        out[0] += 2.0 * M_PI;
+        if (out[0] < 0.0)
+        {
+            out[0] += 2.0 * M_PI;
+        }
     }
+
     return 0;
 }
 
@@ -36,16 +41,21 @@ int Std_map::evolve()
     * T(n+1) = T(n) + p(n+1)       (mod 1)
     */
     out[0] = in[0] + in[1] + (par[0] / (2. * M_PI)) * sin(2. * M_PI * in[0]);
-    out[0] = (out[0] > 0.0) ? fmod(out[0], 1.) : fmod(out[0], 1.) + 1.;
 	out[1] = in[1] + (par[0] / (2. * M_PI)) * sin(2. * M_PI * in[0]);
-    out[1] = fmod(out[1], 1.);
-    if (out[1] > 0.5)
+
+    if (mod)
     {
-        out[1] -= 1.0;
-    }
-    else if (out[1] < -0.5)
-    {
-        out[1] += 1.0;
+        out[0] = (out[0] > 0.0) ? fmod(out[0], 1.) : fmod(out[0], 1.) + 1.;
+        out[1] = fmod(out[1], 1.);
+
+        if (out[1] > 0.5)
+        {
+            out[1] -= 1.0;
+        }
+        else if (out[1] < -0.5)
+        {
+            out[1] += 1.0;
+        }
     }
     return 0;
 }
@@ -62,15 +72,21 @@ int Std_ntwist_map::evolve()
     */
     out[1] = in[1] - par[1] * sin(2 * M_PI * in[0]);
     out[0] = in[0] + par[0] * (1 - pow(out[1], par[2]));
-    out[0] = (out[0] > 0.0) ? fmod(out[0], 1.0) : fmod(out[0], 1.0) + 1.0;
-    if (out[0] > 0.5)
+    
+    if (mod)
     {
-        out[0] -= 1.0;
+        out[0] = (out[0] > 0.0) ? fmod(out[0], 1.0) : fmod(out[0], 1.0) + 1.0;
+
+        if (out[0] > 0.5)
+        {
+            out[0] -= 1.0;
+        }
+        else if (out[0] < -0.5)
+        {
+            out[0] += 1.0;
+        }
     }
-    else if (out[0] < -0.5)
-    {
-        out[0] += 1.0;
-    }
+
     return 0;
 }
 
@@ -83,9 +99,13 @@ int Sfum_map::evolve()
     */
     out[1] = fabs(in[1] - (2. * par[0]) * sin(in[0]));
 	out[0] = fmod(in[0] + 2. / out[1], 2.*M_PI);
-    if (out[0] < 0.0)
+    
+    if (mod)
     {
-        out[0] += 2.0 * M_PI;
+        if (out[0] < 0.0)
+        {
+            out[0] += 2.0 * M_PI;
+        }
     }
     return 0;
 }

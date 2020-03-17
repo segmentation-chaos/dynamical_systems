@@ -12,6 +12,7 @@ class Maps_2d
     private:
         string name = "map_base_class";
     public:
+        bool mod = true;
         double out[2], in[2]; 
         virtual string check_id(){ return name; }
         virtual int evolve(){ return 0; };

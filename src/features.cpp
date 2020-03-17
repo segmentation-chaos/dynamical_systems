@@ -104,3 +104,56 @@ int Analysis::phase_space_2d(Maps_2d* map)
     fclose(fout2);
     return 0;
 }
+
+int Analysis::winding_number(Maps_2d *map)
+{
+    /**
+    * Receives a map for winding number calculation.
+    * 
+    * Return: FILE: Winding number points for each action value (map_id/winding.dat)
+    *         FILE: Set of initial conditions (tt0, J) (map_id/winding_ic.dat)
+    */
+    FILE *fout1, *fout2;
+    string base_dir = "results/";
+    string fl_type = "winding";
+
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
+
+    /* Creates initial pts along a straight line */
+    /* (x0, y0) -> (xf, yf) */
+    double lin_size = sqrt(pow((wind_xf - wind_x0), 2) + pow((wind_yf - wind_y0), 2));
+    double lin_ang = acos((wind_xf - wind_x0) / lin_size);
+    double delta_lin = (double) lin_size / pts_num;
+
+    double w;
+    map->mod = false;
+
+    /* Loop over init. pts */
+    iter_num = 10000;
+    for (int i = 0; i <= pts_num; i++)
+    {
+        map->in[0] = wind_x0 + (double) i * delta_lin * cos(lin_ang);
+        map->in[1] = wind_y0 + (double) i * delta_lin * sin(lin_ang);
+
+        fprintf(fout2, "%f %f\n", map->in[0], map->in[1]); 
+        fprintf(fout1, "%f %f ", map->in[0], map->in[1]);
+
+        for (int n = 0; n < iter_num; n++)
+        {
+            map->evolve();
+			map->in[0] = map->out[0];
+			map->in[1] = map->out[1];
+        }
+        
+        w = (map->in[0] - (wind_x0 + (double) i * delta_lin * cos(lin_ang))) / ((double) iter_num);
+
+        fprintf(fout1, "%f\n", w);
+    }
+
+    map->mod = true;
+    fclose(fout1);
+    fclose(fout2);
+    
+    return 0;
+}

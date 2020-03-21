@@ -24,9 +24,11 @@ int Hal_map::evolve()
 int Hen_map::evolve()
 {
     /** 
-    * Henon Map (x,y)
+    * Henon Map (x,y) (Hénon, Commun. Math. Phys (1976))
     * x(n+1) = a - x(n)^2 + b y(n)
     * y(n+1) = x(n)
+    * 
+    * Parameters: [par[0] = a] [par[1] = b
     */
     out[0] = par[0] - in[0] * in[0] + par[1] * in[1];
     out[1] = in[0];

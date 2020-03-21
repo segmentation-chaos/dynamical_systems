@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
 	/* Map settings */
 	std.par[0] = 1.5;
-	hen.par[0] = 1.4;
+	hen.par[0] = 1.5;
 	hen.par[1] = 0.3;
 	ntwst.par[0] = 0.615;
 	ntwst.par[1] = 0.4;
@@ -104,11 +104,6 @@ int main(int argc, char **argv)
 	orb_5.y0 = 0.01;
 	orb_5.iter_num = 1e4;
 	orb_5.orbit_2d(map_5);
-
-	/* Map settings */
-	std.par[0] = 1.5;
-	hen.par[0] = 0.3;
-	hen.par[1] = 1.0;
 
 	/* Phase space settings*/
 	Analysis ps_1, ps_2, ps_3, ps_4, ps_5;
@@ -172,8 +167,8 @@ int main(int argc, char **argv)
 	System sys(SCR_WIDTH, SCR_HEIGHT);
 
 	// Set 2d map and Analysis features (x,y limits)
-	sys.setMap(map_1);
-	sys.setAnalysis(ps_1);
+	sys.setMap(map_2);
+	sys.setAnalysis(ps_2);
 	
 	// Set 1d map and Analysis features
 	Analysis map_1d_anal;

@@ -35,6 +35,8 @@ class Canvas
         void clear(unsigned short int r = 255,
                    unsigned short int g = 255,
                    unsigned short int b = 255);
+        
+        void setViewport(int x, int y, int w, int h);
 
         void CanvasToSystem();
 
@@ -46,13 +48,21 @@ class Canvas
 
         void drawZoomRect();
 
-        void drawLine();
+        void drawZoomLine();
+
+        void drawLine(int xo, int yo, int xf, int yf,
+                      Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+        
+        void drawPoint(int xo, int yo, 
+                       Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
         void drawOrbit();
 
         int getWidth();
         
         int getHeight();
+
+        int canvas_quit();
 
         // Orbit points
         vector<vector<double>> orb_pts;

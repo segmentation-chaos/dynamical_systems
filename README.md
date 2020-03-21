@@ -2,11 +2,19 @@
 Development of a comprehensive tool for analyzing dynamical systems by graduate students of the Oscillations Control Group (Institute of Physics of the University of São Paulo).
 
 ## Current maps
+# 2D maps
 * Halley
 * Hénon
 * Simplified Fermi-Ulam model
 * Standard
 * Standard nontwist 
+
+# 1D maps
+* Linear sine 
+* Logistic
+* Logistic (2nd order)
+* Moran
+* Triangle
 
 ## Features
 * Orbit 
@@ -21,6 +29,11 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 * r: creates initial condition line
 * s: destroy initial condition line
 * Scrool up|down: increases|decreases the number of points in initial condition line
+
+## CobWeb commands
+* Left click (hold): run cob web iteration
+* w: increase map parameter (par[0])
+* s: decrease map parameter (par[0])
 
 ## Install
 To install dyn_sys, just type `make` in `dynamical_systems/` folder and `./dyn_sys` to run it. `make clean` will delete the executable.

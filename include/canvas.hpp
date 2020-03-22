@@ -65,6 +65,7 @@ class Canvas
         int canvas_quit();
 
         // Orbit points
+        vector<vector<double>> orb_ics;
         vector<vector<double>> orb_pts;
         vector<vector<double>> line_orb;
 
@@ -97,14 +98,15 @@ class Canvas
         int line_cY_b;
         
         // Flags
-        bool quit = false;
-        bool mouse_hold = false;
-        bool zoom = false;
-        bool zoom_quit = false;
-        bool zoom_clear = false;
         bool line_hold = false;
         bool line_quit = false;
         bool line_run = false;
+        bool mouse_hold = false;
+        bool quit = false;
+        bool save_orbit = false;
+        bool zoom = false;
+        bool zoom_quit = false;
+        bool zoom_clear = false;
         
         int line_pts = 0;
         int max_line_pts = 50;

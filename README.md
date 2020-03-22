@@ -1,15 +1,15 @@
 # dynamical_systems
 Development of a comprehensive tool for analyzing dynamical systems by graduate students of the Oscillations Control Group (Institute of Physics of the University of São Paulo).
 
-## Current maps
-# 2D maps
+# Current maps
+## 2D maps
 * Halley
 * Hénon
 * Simplified Fermi-Ulam model
 * Standard
 * Standard nontwist 
 
-# 1D maps
+## 1D maps
 * Linear sine 
 * Logistic
 * Logistic (2nd order)
@@ -25,6 +25,7 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 ## ClickSpace commands
 * Left click (hold): run orbit for click initial point
 * Right click (hold): open zoom window (zoom in when released)
+* p: save orbit into file -> `results/map_name`
 * c: total zoom out
 * r: creates initial condition line
 * s: destroy initial condition line

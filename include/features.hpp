@@ -3,6 +3,7 @@
 
 #include <typeinfo>
 #include <sys/stat.h>
+#include <vector>
 
 #include "maps.hpp"
 
@@ -21,6 +22,10 @@ class Analysis
         int orbit_2d(Maps_2d*);
         int phase_space_2d(Maps_2d*);
         int winding_number(Maps_2d*);
+
+        int save_orbit(Maps_2d *map, 
+                       vector<vector<double>> orbit_pts, 
+                       vector<vector<double>> orbit_ics);
 };
 
 #endif

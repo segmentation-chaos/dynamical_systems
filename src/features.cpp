@@ -189,3 +189,47 @@ int Analysis::winding_number(Maps_2d *map)
     
     return 0;
 }
+
+int Analysis::save_orbit(Maps_2d *map, vector<vector<double>> orbit_pts, 
+                         vector<vector<double>> orbit_ics)
+{
+    /**
+    * Receives a vector of 2D coordinates of an orbit and 
+    * print it to a file in the correspondent map folder.
+    *
+    * Return: FILE: Orbit points (map_id/canvas_orbit.dat)
+    *         FILE: Initial condition (map_id/convas_orbit_ic.dat)
+    */ 
+    FILE *fout1, *fout2;
+    string base_dir = "results/";
+    string fl_type = "canvas_orbit";
+
+    make_dir(base_dir, map->check_id());
+    make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
+
+    fprintf(fout1, "# Orbit points from canvas iteractive phase space\n");
+    fprintf(fout2, "# Orbit initial conditions from canvas iteractive phase space\n");
+    fprintf(fout1, "# Map = %s\n", map->check_id().c_str());
+    fprintf(fout2, "# Map = %s\n", map->check_id().c_str());    
+    
+    // Future implement: print maps parameters (make get_par() function in Maps_2D class)
+    // for (unsigned int i = 0; i < sizeof(map->par) / sizeof(double); i++)
+    // {
+    //     fprintf(fout1, "; par[%d] = %f\n", i, map->par[i]);
+    //     fprintf(fout2, "; par[%d] = %f\n", i, map->par[i]);
+    // }
+
+    // Print orbit points
+    for (unsigned int n = 0; n < orbit_pts[0].size(); n++)
+    {
+        fprintf(fout1, "%f  %f\n", orbit_pts[0][n], orbit_pts[1][n]);
+    }
+
+    // Print orbit initial points
+    for (unsigned int n = 0; n < orbit_ics.size(); n++)
+    {
+        fprintf(fout2, "%f  %f\n", orbit_ics[0][n], orbit_ics[1][n]);
+    }
+
+    return 0;
+}

@@ -167,8 +167,8 @@ int main(int argc, char **argv)
 	System sys(SCR_WIDTH, SCR_HEIGHT);
 
 	// Set 2d map and Analysis features (x,y limits)
-	sys.setMap(map_2);
-	sys.setAnalysis(ps_2);
+	sys.setMap(map_3);
+	sys.setAnalysis(ps_3);
 	
 	// Set 1d map and Analysis features
 	Analysis map_1d_anal;
@@ -177,11 +177,11 @@ int main(int argc, char **argv)
 	map_1d_anal.y_min = -0.01;
 	map_1d_anal.y_max =  1.10;
 	sys.setMap_1d(map_1d_4);
-	sys.setAnalysis(map_1d_anal);
+	// sys.setAnalysis(map_1d_anal);
 
 	// Choose which application to run
-	sys.running_map_2d = 0;
-	sys.running_cobweb = 1;
+	sys.running_map_2d = 1;
+	sys.running_cobweb = 0;
 
 	while (sys.running_sys)
 	{

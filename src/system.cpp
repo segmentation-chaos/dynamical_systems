@@ -30,6 +30,8 @@ int System::run_map_2d()
                 // Convert Canvas -> System
                 canvas.CanvasToSystem();
 
+                canvas.orb_ics[0].push_back(canvas.sX);
+                canvas.orb_ics[1].push_back(canvas.sY);
                 canvas.orb_pts[0].push_back(canvas.sX);
                 canvas.orb_pts[1].push_back(canvas.sY);
 
@@ -41,6 +43,14 @@ int System::run_map_2d()
             else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP)
             {
                 canvas.mouse_hold = false;
+            }
+
+            // Save Orbit
+            // Current handle event routine doesn't handle double key press!!!
+            canvas.save_orbit = false;
+            if (canvas.cEvent.key.keysym.sym == SDLK_p)
+            {
+                canvas.save_orbit = true;
             }
 
             // Draw zoom rectangle
@@ -153,6 +163,14 @@ int System::run_map_2d()
 
             map->in[0] = map->out[0];
             map->in[1] = map->out[1];
+        }
+
+        // Save orbit points
+        if (canvas.save_orbit)
+        {
+            cout << "Save" << endl;
+            analy->save_orbit(map, canvas.orb_pts, canvas.orb_ics);
+            canvas.save_orbit = false;
         }
 
         // Draw zoom rectangle
@@ -415,6 +433,7 @@ void System::setMap(Maps_2d *map_in)
     map = map_in;
 
     // Allocate vectors
+    canvas.orb_ics.resize(2, vector<double>(0));
     canvas.orb_pts.resize(2, vector<double>(0));
     canvas.line_orb.resize(2, vector<double>(0));
 }

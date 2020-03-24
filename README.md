@@ -24,7 +24,7 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 
 ## ClickSpace commands
 * Left click (hold): run orbit for click initial point
-* Right click (hold): open zoom window (zoom in when released)
+* Right click: open zoom window (zoom in with Left click)
 * p: save orbit into file -> `results/map_name`
 * c: total zoom out
 * r: creates initial condition line

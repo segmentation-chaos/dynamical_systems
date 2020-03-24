@@ -98,6 +98,7 @@ class Canvas
         int line_cY_b;
         
         // Flags
+        bool canvas_drew = false;
         bool line_hold = false;
         bool line_quit = false;
         bool line_run = false;

@@ -60,7 +60,7 @@ int System::run_map_2d()
                 SDL_GetMouseState(&canvas.zoom_cX_a, &canvas.zoom_cY_a);
                 canvas.zoom = true;
             }
-            else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP && canvas.zoom)
+            else if (canvas.cEvent.button.button == SDL_BUTTON_LEFT && canvas.zoom)
             {
                 canvas.zoom = false;
                 canvas.zoom_quit = true;
@@ -267,10 +267,6 @@ int System::run_map_2d()
     {
         return 0;
     }
-    else
-    {
-        return 1;
-    }
 
     return 1;
 }
@@ -415,9 +411,227 @@ int System::run_cobweb()
     {
         return 0;
     }
-    else
+
+    return 1;
+}
+
+int System::run_bifurc_diagram()
+{
+    unsigned int N_trans = 1500; // Transient points
+    unsigned int N_convd = 180;  // Converged points (plot)
+    unsigned int N_par = 8e3;    // Number of parameters to run
+    double convd_eps = 1e-8;     // Convergence criteria
+
+    // Points color
+    Uint8 r_pt = 10;
+    Uint8 g_pt = 10;
+    Uint8 b_pt = 10;
+
+    // Plot settings
+    canvas.sX_min = map_1d->get_par_min();
+    canvas.sX_max = map_1d->get_par_max();
+    canvas.sX_scl_min = map_1d->get_par_min();
+    canvas.sX_scl_max = map_1d->get_par_max();
+
+    // Game loop
+    while (!canvas.quit)
     {
-        return 1;
+        // Event handling
+        while (SDL_PollEvent(&(canvas.cEvent)) != 0)
+        {
+            // Close window request
+            if (canvas.cEvent.type == SDL_QUIT) { canvas.quit = true; }
+
+            // Draw zoom rectangle
+            canvas.zoom_quit = false;
+            if (canvas.cEvent.button.button == SDL_BUTTON_RIGHT && !canvas.zoom)
+            {
+                SDL_GetMouseState(&canvas.zoom_cX_a, &canvas.zoom_cY_a);
+                canvas.zoom = true;
+                canvas.canvas_drew = false;
+            }
+            else if (canvas.cEvent.button.button == SDL_BUTTON_LEFT && canvas.zoom)
+            {
+                canvas.zoom = false;
+                canvas.zoom_quit = true;
+            }
+
+            // Total zoom out
+            if (canvas.cEvent.key.keysym.sym == SDLK_c)
+            {
+                canvas.zoom_clear = true;
+            }
+        }
+
+        // Calculate and draw points
+        // Check if points were not drew yet
+        if (!canvas.canvas_drew)
+        {
+            canvas.clear();
+
+            // Parameter step
+            double dpar = abs(canvas.sX_scl_max - canvas.sX_scl_min) / (double) N_par; 
+            for (double par = canvas.sX_scl_min; par <= canvas.sX_scl_max; par += dpar)
+            {
+                canvas.sX = par;
+                map_1d->set_par(par);
+                map_1d->in = 0.1; // Temporary (set how to select the initial condition)
+
+                for (unsigned int n = 0; n < (N_trans + N_convd); n++)
+                {
+                    map_1d->evolve();
+                    
+                    if (n > N_trans)
+                    {
+                        canvas.sY = map_1d->out;
+                        canvas.SystemToCanvas();
+                        canvas.drawPoint(canvas.cX, canvas.cY, r_pt, g_pt, b_pt, 255);
+                        
+                        // Avoid calculate  orbits already converged
+                        if ((map_1d->in - convd_eps) < map_1d->out && 
+                            (map_1d->in + convd_eps) > map_1d->out)
+                        {
+                            break;
+                        }
+                    }
+
+                    map_1d->in = map_1d->out;
+                }
+            }
+
+            canvas.canvas_drew = true;
+        }
+        
+
+        // Draw zoom rectangle
+        if (canvas.zoom) 
+        {
+            canvas.canvas_drew = false;
+            canvas.clear();
+            
+            // Parameter step
+            double dpar = abs(canvas.sX_scl_max - canvas.sX_scl_min) / (double) N_par; 
+            for (double par = canvas.sX_scl_min; par <= canvas.sX_scl_max; par += dpar)
+            {
+                canvas.sX = par;
+                map_1d->set_par(par);
+                map_1d->in = 0.1; // Temporary (set how to select the initial condition)
+
+                for (unsigned int n = 0; n < (N_trans + N_convd); n++)
+                {
+                    map_1d->evolve();
+                    
+                    if (n > N_trans)
+                    {
+                        canvas.sY = map_1d->out;
+                        canvas.SystemToCanvas();
+                        canvas.drawPoint(canvas.cX, canvas.cY, r_pt, g_pt, b_pt, 255);
+                        
+                        // Avoid calculate  orbits already converged
+                        if ((map_1d->in - convd_eps) < map_1d->out && 
+                            (map_1d->in + convd_eps) > map_1d->out)
+                        {
+                            break;
+                        }
+                    }
+
+                    map_1d->in = map_1d->out;
+                }
+            }
+
+            SDL_GetMouseState(&canvas.zoom_cX_b, &canvas.zoom_cY_b);
+            canvas.drawZoomRect();
+        }
+        else if (!canvas.zoom && canvas.zoom_quit)
+        {
+            // Update scale
+            canvas.SetNewScale();
+            canvas.clear();
+            
+            // Parameter step
+            double dpar = abs(canvas.sX_scl_max - canvas.sX_scl_min) / (double) N_par; 
+            for (double par = canvas.sX_scl_min; par <= canvas.sX_scl_max; par += dpar)
+            {
+                canvas.sX = par;
+                map_1d->set_par(par);
+                map_1d->in = 0.1; // Temporary (set how to select the initial condition)
+
+                for (unsigned int n = 0; n < (N_trans + N_convd); n++)
+                {
+                    map_1d->evolve();
+                    
+                    if (n > N_trans)
+                    {
+                        canvas.sY = map_1d->out;
+                        canvas.SystemToCanvas();
+                        canvas.drawPoint(canvas.cX, canvas.cY, r_pt, g_pt, b_pt, 255);
+                        
+                        // Avoid calculate  orbits already converged
+                        if ((map_1d->in - convd_eps) < map_1d->out && 
+                            (map_1d->in + convd_eps) > map_1d->out)
+                        {
+                            break;
+                        }
+                    }
+
+                    map_1d->in = map_1d->out;
+                }
+            }
+
+            canvas.zoom_quit = false;
+            canvas.canvas_drew = true;
+        }
+
+        // Total zoom out
+        if (canvas.zoom_clear)
+        {
+            canvas.sX_scl_min = canvas.sX_min;
+            canvas.sX_scl_max = canvas.sX_max;
+            canvas.sY_scl_min = canvas.sY_min;
+            canvas.sY_scl_max = canvas.sY_max;
+            canvas.zoom_clear = false;
+
+            canvas.clear();
+
+            // Parameter step
+            double dpar = abs(canvas.sX_scl_max - canvas.sX_scl_min) / (double) N_par; 
+            for (double par = canvas.sX_scl_min; par <= canvas.sX_scl_max; par += dpar)
+            {
+                canvas.sX = par;
+                map_1d->set_par(par);
+                map_1d->in = 0.1; // Temporary (set how to select the initial condition)
+
+                for (unsigned int n = 0; n < (N_trans + N_convd); n++)
+                {
+                    map_1d->evolve();
+                    
+                    if (n > N_trans)
+                    {
+                        canvas.sY = map_1d->out;
+                        canvas.SystemToCanvas();
+                        canvas.drawPoint(canvas.cX, canvas.cY, r_pt, g_pt, b_pt, 255);
+                        
+                        // Avoid calculate  orbits already converged
+                        if ((map_1d->in - convd_eps) < map_1d->out && 
+                            (map_1d->in + convd_eps) > map_1d->out)
+                        {
+                            break;
+                        }
+                    }
+
+                    map_1d->in = map_1d->out;
+                }
+            }
+            
+            canvas.canvas_drew = true;
+        }
+
+        canvas.show();
+    }
+
+    if (canvas.quit == true)
+    {
+        return 0;
     }
 
     return 1;

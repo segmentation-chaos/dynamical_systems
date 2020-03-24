@@ -22,11 +22,13 @@ class System
 
         int run_map_2d();
         int run_cobweb();
+        int run_bifurc_diagram();
         int sys_quit();
 
         int running_sys;
         int running_map_2d;
         int running_cobweb;
+        int running_bifurc_diagram;
 };
 
 #endif

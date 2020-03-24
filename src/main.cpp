@@ -172,16 +172,18 @@ int main(int argc, char **argv)
 	
 	// Set 1d map and Analysis features
 	Analysis map_1d_anal;
-	map_1d_anal.x_min = -0.01;
-	map_1d_anal.x_max =  1.00;
-	map_1d_anal.y_min = -0.01;
-	map_1d_anal.y_max =  1.10;
-	sys.setMap_1d(map_1d_4);
-	// sys.setAnalysis(map_1d_anal);
+	map_1d_anal.x0 = 0.1;
+	map_1d_anal.x_min = map_1d_1->get_par_min();
+	map_1d_anal.x_max = map_1d_1->get_par_max();
+	map_1d_anal.y_min = 0.0;
+	map_1d_anal.y_max = 1.0;
+	sys.setMap_1d(map_1d_1);
+	sys.setAnalysis(map_1d_anal); // (Enable to run cobweb() or bifurc_diagram())
 
 	// Choose which application to run
-	sys.running_map_2d = 1;
+	sys.running_map_2d = 0;
 	sys.running_cobweb = 0;
+	sys.running_bifurc_diagram = 1;
 
 	while (sys.running_sys)
 	{
@@ -197,6 +199,11 @@ int main(int argc, char **argv)
 			sys.running_cobweb = sys.run_cobweb();
 		}
 		
+		while (sys.running_bifurc_diagram)
+		{
+			sys.running_bifurc_diagram = sys.run_bifurc_diagram();
+		}
+
 		sys.running_sys = 0;
 	} 
 

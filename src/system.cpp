@@ -60,7 +60,7 @@ int System::run_map_2d()
                 SDL_GetMouseState(&canvas.zoom_cX_a, &canvas.zoom_cY_a);
                 canvas.zoom = true;
             }
-            else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP && canvas.zoom)
+            else if (canvas.cEvent.button.button == SDL_BUTTON_LEFT && canvas.zoom)
             {
                 canvas.zoom = false;
                 canvas.zoom_quit = true;

@@ -12,6 +12,8 @@ System::System(unsigned int scrWidth, unsigned int scrHeight)
 
 int System::run_map_2d()
 {
+    long unsigned int orb_size;
+
     // Game loop
     while (!canvas.quit)
     {
@@ -39,6 +41,10 @@ int System::run_map_2d()
                 map->in[1] = canvas.sY;
 
                 canvas.mouse_hold = true;
+
+                orb_size = 1;
+                canvas.orb_sizes.push_back(1);
+                
             }
             else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP)
             {
@@ -51,6 +57,13 @@ int System::run_map_2d()
             if (canvas.cEvent.key.keysym.sym == SDLK_p)
             {
                 canvas.save_orbit = true;
+            }
+
+            // Delete last iterated orbit
+            canvas.undo_orbit = false;
+            if (canvas.cEvent.key.keysym.sym == SDLK_x)
+            {
+                canvas.undo_orbit = true;
             }
 
             // Draw zoom rectangle
@@ -87,6 +100,7 @@ int System::run_map_2d()
             {
                 SDL_GetMouseState(&canvas.line_cX_b, &canvas.line_cY_b);
                 double versor[2];
+                orb_size = 0;
 
                 // Allocates line points in a vector
                 if (canvas.line_pts != 0)
@@ -102,6 +116,8 @@ int System::run_map_2d()
                         canvas.CanvasToSystem();
                         canvas.line_orb[0].push_back(canvas.sX);
                         canvas.line_orb[1].push_back(canvas.sY);
+                        
+                        orb_size += 1;
                     }
                 }
                 else if (canvas.line_pts == 0)
@@ -119,8 +135,11 @@ int System::run_map_2d()
                     canvas.CanvasToSystem();
                     canvas.line_orb[0].push_back(canvas.sX);
                     canvas.line_orb[1].push_back(canvas.sY);
+
+                    orb_size = 2;
                 }
                 
+                canvas.orb_sizes.push_back(orb_size);
                 canvas.line_run = true;
             }
 
@@ -163,6 +182,9 @@ int System::run_map_2d()
 
             map->in[0] = map->out[0];
             map->in[1] = map->out[1];
+
+            orb_size += 1;
+            canvas.orb_sizes.back() = orb_size;
         }
 
         // Save orbit points
@@ -171,6 +193,29 @@ int System::run_map_2d()
             cout << "Save" << endl;
             analy->save_orbit(map, canvas.orb_pts, canvas.orb_ics);
             canvas.save_orbit = false;
+        }
+
+        // Undo last orbit
+        if (canvas.undo_orbit)
+        {
+            if ((int) canvas.orb_pts[0].size() > canvas.orb_sizes.back())
+            {
+                canvas.orb_pts[0].resize(canvas.orb_pts[0].size() - canvas.orb_sizes.back());
+                canvas.orb_pts[1].resize(canvas.orb_pts[1].size() - canvas.orb_sizes.back());
+            
+                canvas.clear();
+                canvas.drawOrbit();
+                canvas.undo_orbit = false;
+            }
+            else if ((int) canvas.orb_pts[0].size() <= canvas.orb_sizes.back())
+            {
+                canvas.orb_pts[0].resize(1);
+                canvas.orb_pts[1].resize(1);
+
+                canvas.clear();
+                canvas.drawOrbit();
+                canvas.undo_orbit = false;
+            }
         }
 
         // Draw zoom rectangle
@@ -216,7 +261,6 @@ int System::run_map_2d()
         {
             canvas.clear();
             canvas.drawOrbit();
-            // canvas.line_run = true;
             canvas.line_quit = false;
         }
         else if (canvas.line_run)
@@ -241,13 +285,15 @@ int System::run_map_2d()
                     canvas.orb_pts[1].push_back(canvas.sY);
 
                     canvas.line_orb[0][p] = canvas.sX;
-                    canvas.line_orb[1][p] = canvas.sY;                    
+                    canvas.line_orb[1][p] = canvas.sY;
                 }
+
+                orb_size += canvas.line_orb[0].size();
+                canvas.orb_sizes.back() = orb_size;
                 canvas.line_iter += 1;
             }
             else
             {
-
                 canvas.line_orb[0].clear();
                 canvas.line_orb[1].clear();
 
@@ -257,6 +303,8 @@ int System::run_map_2d()
                 canvas.line_run = false;
                 canvas.line_quit = true;
                 canvas.line_hold = false;
+
+                orb_size = 0;
             }
         }
 
@@ -433,6 +481,7 @@ void System::setMap(Maps_2d *map_in)
     map = map_in;
 
     // Allocate vectors
+    canvas.orb_sizes.resize(1, 0);
     canvas.orb_ics.resize(2, vector<double>(0));
     canvas.orb_pts.resize(2, vector<double>(0));
     canvas.line_orb.resize(2, vector<double>(0));

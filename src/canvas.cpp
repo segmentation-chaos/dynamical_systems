@@ -95,6 +95,12 @@ void Canvas::clear(unsigned short int r, unsigned short int g,
     SDL_RenderClear(cRenderer);
 }
 
+void Canvas::setViewport(int x, int y, int w, int h)
+{
+    SDL_Rect viewport = {x, y, w, h};
+    SDL_RenderSetViewport(cRenderer, &viewport);
+}
+
 void Canvas::CanvasToSystem()
 {
     sX = fabs(sX_scl_max - sX_scl_min) * ((double) cX / (double) cWidth) + sX_scl_min;
@@ -157,7 +163,7 @@ void Canvas::drawZoomRect()
     SDL_RenderDrawRect(cRenderer, &zoomRect);
 }
 
-void Canvas::drawLine()
+void Canvas::drawZoomLine()
 {
     setColor(lineR, lineG, lineB, lineA);
     SDL_RenderDrawLine(cRenderer, line_cX_a, line_cY_a, line_cX_b, line_cY_b);
@@ -182,6 +188,18 @@ void Canvas::drawLine()
     }
 }
 
+void Canvas::drawLine(int xo, int yo, int xf, int yf, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    setColor(r, g, b, a);
+    SDL_RenderDrawLine(cRenderer, xo, yo, xf, yf);
+}
+
+void Canvas::drawPoint(int xo, int yo, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    setColor(r, g, b, a);
+    SDL_RenderDrawPoint(cRenderer, xo, yo);
+}
+
 void Canvas::drawOrbit()
 {
     for (unsigned int i = 0; i < orb_pts[0].size(); i++)
@@ -202,4 +220,16 @@ int Canvas::getWidth()
 int Canvas::getHeight()
 {
     return cHeight;
+}
+
+int Canvas::canvas_quit()
+{
+    SDL_DestroyRenderer(cRenderer);
+    SDL_DestroyWindow(cWindow);
+    cRenderer = NULL;
+    cWindow = NULL;
+
+    SDL_Quit();
+
+    return 0;
 }

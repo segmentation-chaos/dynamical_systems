@@ -24,9 +24,11 @@ int Hal_map::evolve()
 int Hen_map::evolve()
 {
     /** 
-    * Henon Map (x,y)
+    * Henon Map (x,y) (Hénon, Commun. Math. Phys (1976))
     * x(n+1) = a - x(n)^2 + b y(n)
     * y(n+1) = x(n)
+    * 
+    * Parameters: [par[0] = a] [par[1] = b
     */
     out[0] = par[0] - in[0] * in[0] + par[1] * in[1];
     out[1] = in[0];
@@ -107,5 +109,112 @@ int Sfum_map::evolve()
             out[0] += 2.0 * M_PI;
         }
     }
+    return 0;
+}
+
+int Log_map::evolve()
+{
+    /**
+     * Logistic map (x) (May, Nature (1976))
+     * x(n+1) = a x(n) (1 - x(n))
+     * 
+     * Parameters: [par[0] = a]
+     * Domain: x -> (0.0, 1.0) 
+     *         a -> [1, 4] (for non-trivial dynamic behavior)
+     **/
+
+    out = par[0] * in * (1.0 - in);
+
+    return 0;
+}
+
+int Log_map_2ndO::evolve()
+{
+    /**
+     * Logistic map (x) -- 2nd iteration (May, Nature (1976))
+     * x(n+2) = a x(n+1) (1 - x(n+1))
+     *        = a (a x(n) (1 - x(n))) (1 - a x(n) (1 - x(n)))
+     * 
+     * Parameters: [par[0] = a]
+     * Domain: x -> (0.0, 1.0) 
+     *         a -> [1, 4] (for non-trivial dynamic behavior)
+     **/
+
+    out = par[0] * (par[0] * in * (1.0 - in)) * (1.0 - par[0] * in * (1.0 - in));
+    
+    return 0;
+}
+
+int Moran_map::evolve()
+{
+    /**
+     * Moran map (x) (May, Nature (1976))
+     * x(n+1) = x(n) * exp(r * (1 - x))
+     * 
+     * Parmeters: [par[0] = r]
+     * Domain: x -> (0.0, 1.0)
+     *         r -> [0, inf]
+     **/
+    out = in * exp(par[0] * (1.0 - in));
+
+    return 0;
+}
+
+int Triang_map::evolve()
+{
+    /**
+     * Triangle map (x) (May, Nature (1976))
+     * x(n+1) = a * x(n)       if (x < 1/2)
+     *          a * (1-x(n))   if (x > 1/2)
+     *
+     * Parameters: [par[0] = a]
+     * Domain: x -> (0.0, 1.0)
+     *         a -> [0, 2.0]
+     **/
+    out = (in < 0.5) ? par[0] * in : par[0] * (1.0 - in);
+    
+    return 0;
+}
+
+int Lin_sin_map::evolve()
+{
+    /** 
+     * Linear sine map (x)
+     * x(n+1) = 0.5 (x(n) + sin(w * x(n))
+     * 
+     * Parameters: [par[0] = w]
+     * Domain: x -> (0.0, 1.0)
+     *         w -> [0, inf]
+     **/
+    out = 0.5 * (in + sin(par[0] * in));
+
+    return 0;
+}
+
+int Log_map::set_par(double new_par)
+{
+    par[0] = new_par;
+    return 0;
+}
+int Log_map_2ndO::set_par(double new_par)
+{
+    par[0] = new_par;
+
+    return 0;
+}
+int Moran_map::set_par(double new_par)
+{
+    par[0] = new_par;
+    return 0;
+}
+int Triang_map::set_par(double new_par)
+{
+    par[0] = new_par;
+    return 0;
+}
+int Lin_sin_map::set_par(double new_par)
+{
+    par[0] = new_par;
+
     return 0;
 }

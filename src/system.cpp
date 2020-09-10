@@ -1,32 +1,19 @@
 #include "system.hpp"
 
-System::System(unsigned int scrWidth, unsigned int scrHeight,
-               Maps_2d *map_type, Analysis anal_type)
+System::System(unsigned int scrWidth, unsigned int scrHeight)
 {
-    map = map_type;
-    analy = &anal_type;
-
+    // Load SDL and set canvas
     canvas.init(scrWidth, scrHeight);
     canvas.clear();
     canvas.setColor(255, 255, 255, 255);
 
-    // Set system coordinates to map
-    canvas.sX_min = analy->x_min;
-    canvas.sX_max = analy->x_max;
-    canvas.sY_min = analy->y_min;
-    canvas.sY_max = analy->y_max;
-    canvas.sX_scl_min = canvas.sX_min;
-    canvas.sX_scl_max = canvas.sX_max;
-    canvas.sY_scl_min = canvas.sY_min;
-    canvas.sY_scl_max = canvas.sY_max;
-
-    // Allocate vectors
-    canvas.orb_pts.resize(2, vector<double>(0));
-    canvas.line_orb.resize(2, vector<double>(0));
+    running_sys = 1;
 }
 
-int System::run()
+int System::run_map_2d()
 {
+    long unsigned int orb_size;
+
     // Game loop
     while (!canvas.quit)
     {
@@ -45,6 +32,8 @@ int System::run()
                 // Convert Canvas -> System
                 canvas.CanvasToSystem();
 
+                canvas.orb_ics[0].push_back(canvas.sX);
+                canvas.orb_ics[1].push_back(canvas.sY);
                 canvas.orb_pts[0].push_back(canvas.sX);
                 canvas.orb_pts[1].push_back(canvas.sY);
 
@@ -52,10 +41,29 @@ int System::run()
                 map->in[1] = canvas.sY;
 
                 canvas.mouse_hold = true;
+
+                orb_size = 1;
+                canvas.orb_sizes.push_back(1);
+                
             }
             else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP)
             {
                 canvas.mouse_hold = false;
+            }
+
+            // Save Orbit
+            // Current handle event routine doesn't handle double key press!!!
+            canvas.save_orbit = false;
+            if (canvas.cEvent.key.keysym.sym == SDLK_p)
+            {
+                canvas.save_orbit = true;
+            }
+
+            // Delete last iterated orbit
+            canvas.undo_orbit = false;
+            if (canvas.cEvent.key.keysym.sym == SDLK_x)
+            {
+                canvas.undo_orbit = true;
             }
 
             // Draw zoom rectangle
@@ -65,7 +73,7 @@ int System::run()
                 SDL_GetMouseState(&canvas.zoom_cX_a, &canvas.zoom_cY_a);
                 canvas.zoom = true;
             }
-            else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP && canvas.zoom)
+            else if (canvas.cEvent.button.button == SDL_BUTTON_LEFT && canvas.zoom)
             {
                 canvas.zoom = false;
                 canvas.zoom_quit = true;
@@ -92,6 +100,7 @@ int System::run()
             {
                 SDL_GetMouseState(&canvas.line_cX_b, &canvas.line_cY_b);
                 double versor[2];
+                orb_size = 0;
 
                 // Allocates line points in a vector
                 if (canvas.line_pts != 0)
@@ -107,6 +116,8 @@ int System::run()
                         canvas.CanvasToSystem();
                         canvas.line_orb[0].push_back(canvas.sX);
                         canvas.line_orb[1].push_back(canvas.sY);
+                        
+                        orb_size += 1;
                     }
                 }
                 else if (canvas.line_pts == 0)
@@ -124,8 +135,11 @@ int System::run()
                     canvas.CanvasToSystem();
                     canvas.line_orb[0].push_back(canvas.sX);
                     canvas.line_orb[1].push_back(canvas.sY);
+
+                    orb_size = 2;
                 }
                 
+                canvas.orb_sizes.push_back(orb_size);
                 canvas.line_run = true;
             }
 
@@ -168,6 +182,40 @@ int System::run()
 
             map->in[0] = map->out[0];
             map->in[1] = map->out[1];
+
+            orb_size += 1;
+            canvas.orb_sizes.back() = orb_size;
+        }
+
+        // Save orbit points
+        if (canvas.save_orbit)
+        {
+            cout << "Save" << endl;
+            analy->save_orbit(map, canvas.orb_pts, canvas.orb_ics);
+            canvas.save_orbit = false;
+        }
+
+        // Undo last orbit
+        if (canvas.undo_orbit)
+        {
+            if ((int) canvas.orb_pts[0].size() > canvas.orb_sizes.back())
+            {
+                canvas.orb_pts[0].resize(canvas.orb_pts[0].size() - canvas.orb_sizes.back());
+                canvas.orb_pts[1].resize(canvas.orb_pts[1].size() - canvas.orb_sizes.back());
+            
+                canvas.clear();
+                canvas.drawOrbit();
+                canvas.undo_orbit = false;
+            }
+            else if ((int) canvas.orb_pts[0].size() <= canvas.orb_sizes.back())
+            {
+                canvas.orb_pts[0].resize(1);
+                canvas.orb_pts[1].resize(1);
+
+                canvas.clear();
+                canvas.drawOrbit();
+                canvas.undo_orbit = false;
+            }
         }
 
         // Draw zoom rectangle
@@ -207,13 +255,12 @@ int System::run()
             canvas.clear();
             canvas.drawOrbit();
             SDL_GetMouseState(&canvas.line_cX_b, &canvas.line_cY_b);
-            canvas.drawLine();
+            canvas.drawZoomLine();
         }
         else if (canvas.line_quit && !canvas.line_run)
         {
             canvas.clear();
             canvas.drawOrbit();
-            // canvas.line_run = true;
             canvas.line_quit = false;
         }
         else if (canvas.line_run)
@@ -238,13 +285,15 @@ int System::run()
                     canvas.orb_pts[1].push_back(canvas.sY);
 
                     canvas.line_orb[0][p] = canvas.sX;
-                    canvas.line_orb[1][p] = canvas.sY;                    
+                    canvas.line_orb[1][p] = canvas.sY;
                 }
+
+                orb_size += canvas.line_orb[0].size();
+                canvas.orb_sizes.back() = orb_size;
                 canvas.line_iter += 1;
             }
             else
             {
-
                 canvas.line_orb[0].clear();
                 canvas.line_orb[1].clear();
 
@@ -254,6 +303,8 @@ int System::run()
                 canvas.line_run = false;
                 canvas.line_quit = true;
                 canvas.line_hold = false;
+
+                orb_size = 0;
             }
         }
 
@@ -272,18 +323,173 @@ int System::run()
     return 1;
 }
 
+int System::run_cobweb()
+{
+    // Game loop
+    while (!canvas.quit)
+    {
+        // Event handling
+        while (SDL_PollEvent(&(canvas.cEvent)) != 0)
+        {
+            // Close window request
+            if (canvas.cEvent.type == SDL_QUIT) { canvas.quit = true; }
+
+            // Run for one click
+            if (canvas.cEvent.button.button == SDL_BUTTON_LEFT && !canvas.mouse_hold)
+            {
+                canvas.mouse_hold = true;
+            }
+            else if (canvas.cEvent.type == SDL_MOUSEBUTTONUP)
+            {
+                canvas.mouse_hold = false;
+            }
+
+            // Increase|Decrease system's main parameter
+            // Currently this feature do not consider systems 
+            // with more than 1 par. It always changes par[0]
+            // Current problem with setting par[0]: map_1d->par[0] += x --> (seg_fault)
+            //  Must use get/set functions
+            
+            // Increase par[0]
+            if (canvas.cEvent.key.keysym.sym == SDLK_s)
+            {
+                double cur_par = map_1d->get_par();
+                double incr = abs(map_1d->get_par_max() - map_1d->get_par_min()) / 120.0;
+                map_1d->set_par(cur_par - incr);
+                
+                if (map_1d->get_par() < map_1d->get_par_min()) 
+                {
+                    map_1d->set_par(map_1d->get_par_min());
+                }
+            }
+            // Decrease par[0]
+            if (canvas.cEvent.key.keysym.sym == SDLK_w)
+            {
+                double cur_par = map_1d->get_par();
+                double incr = abs(map_1d->get_par_max() - map_1d->get_par_min()) / 120.0;
+                map_1d->set_par(cur_par + incr);
+
+                if (map_1d->get_par() > map_1d->get_par_max())
+                {
+                    map_1d->set_par(map_1d->get_par_max());
+                }
+            }
+        }
+
+        // Clear canvas
+        canvas.clear();
+        
+        /*** Draw indentity line (X = F(X)) ***/
+        // Identity line color
+        Uint8 r_id = 50;
+        Uint8 g_id = 50;
+        Uint8 b_id = 50; 
+        // Set origin point
+        canvas.sX = 0.0;
+        canvas.sY = 0.0;
+        canvas.SystemToCanvas();
+        int cX0 = canvas.cX;
+        int cY0 = canvas.cY;
+        // Set final point
+        canvas.sX = canvas.sX_max;
+        canvas.sY = canvas.sX_max;
+        canvas.SystemToCanvas();
+        int cXf = canvas.cX;
+        int cYf = canvas.cY;
+        canvas.drawLine(cX0, cY0, cXf, cYf, r_id, g_id, b_id, 255);
+
+        /*** Draw axes ***/
+        // Axes color
+        Uint8 r_ax = 0;
+        Uint8 g_ax = 130;
+        Uint8 b_ax = 0;
+        canvas.drawLine(cX0, cY0, cXf, cY0, r_ax, g_ax, b_ax, 255);
+        canvas.drawLine(cX0, cY0, cX0, cYf, r_ax, g_ax, b_ax, 255);
+
+        // Function graphs color
+        Uint8 r_fc = 0;
+        Uint8 g_fc = 50;
+        Uint8 b_fc = 200;
+        unsigned int pts_fc = 10000;
+        for (unsigned int p = 0; p < pts_fc; p++)
+        {
+            // Draw map function F(X)
+            canvas.sX = ((double) p / pts_fc) * abs(canvas.sX_max - canvas.sX_min);
+            map_1d->in = canvas.sX;
+            map_1d->evolve();
+            canvas.sY = map_1d->out;
+            canvas.SystemToCanvas();
+            canvas.drawPoint(canvas.cX, canvas.cY, r_fc, g_fc, b_fc, 255);
+        }
+        
+        // Iter cobweb
+        if (canvas.mouse_hold)
+        {
+            Uint8 r_cbw = 255;
+            Uint8 g_cbw = 0;
+            Uint8 b_cbw = 0;
+            Uint8 a_cbw = 200;
+            unsigned int CobWeb_iter = 5000;
+            SDL_GetMouseState(&canvas.cX, &canvas.cY);
+            int cX0 = canvas.cX;
+            int cY0 = canvas.cY;
+    
+            for (unsigned int i = 0; i < CobWeb_iter; i++)
+            {
+                // Vertical line (go to F(X))
+                canvas.CanvasToSystem();
+                map_1d->in = canvas.sX;
+                map_1d->evolve();
+                canvas.sY = map_1d->out;
+                canvas.SystemToCanvas();
+                canvas.drawLine(cX0, cY0, cX0, canvas.cY, r_cbw, g_cbw, b_cbw, a_cbw);
+
+                // Horizontal line (go to Identity line)
+                cY0 = canvas.cY;
+                canvas.sX = canvas.sY;
+                canvas.SystemToCanvas();
+                canvas.drawLine(cX0, cY0, canvas.cX, canvas.cY, r_cbw, g_cbw, b_cbw, a_cbw);
+                
+                // Update to next iter
+                cX0 = canvas.cX;
+                cY0 = canvas.cY;
+            }
+        }
+
+        canvas.show();
+    }
+
+    if (canvas.quit == true)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+
+    return 1;
+}
+
+void System::setMap_1d(Maps_1d *map_in)
+{
+    map_1d = map_in;
+}
+
 void System::setMap(Maps_2d *map_in) 
 {
     map = map_in;
+
+    // Allocate vectors
+    canvas.orb_sizes.resize(1, 0);
+    canvas.orb_ics.resize(2, vector<double>(0));
+    canvas.orb_pts.resize(2, vector<double>(0));
+    canvas.line_orb.resize(2, vector<double>(0));
 }
 
 void System::setAnalysis(Analysis anal_in)
-{
-    // x0; y0; iter_num omitted since are not used 
-    analy->x_min = anal_in.x_min;
-    analy->x_max = anal_in.x_max;
-    analy->y_min = anal_in.y_min;
-    analy->y_max = anal_in.y_max;
+{    
+    analy = &anal_in;
 
     // Set system coordinates to map
     canvas.sX_min = analy->x_min;
@@ -294,4 +500,9 @@ void System::setAnalysis(Analysis anal_in)
     canvas.sX_scl_max = canvas.sX_max;
     canvas.sY_scl_min = canvas.sY_min;
     canvas.sY_scl_max = canvas.sY_max;
+}
+
+int System::sys_quit()
+{
+    return canvas.canvas_quit();
 }

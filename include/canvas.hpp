@@ -35,6 +35,8 @@ class Canvas
         void clear(unsigned short int r = 255,
                    unsigned short int g = 255,
                    unsigned short int b = 255);
+        
+        void setViewport(int x, int y, int w, int h);
 
         void CanvasToSystem();
 
@@ -46,7 +48,13 @@ class Canvas
 
         void drawZoomRect();
 
-        void drawLine();
+        void drawZoomLine();
+
+        void drawLine(int xo, int yo, int xf, int yf,
+                      Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+        
+        void drawPoint(int xo, int yo, 
+                       Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
         void drawOrbit();
 
@@ -54,7 +62,11 @@ class Canvas
         
         int getHeight();
 
+        int canvas_quit();
+
         // Orbit points
+        vector<int> orb_sizes;
+        vector<vector<double>> orb_ics;
         vector<vector<double>> orb_pts;
         vector<vector<double>> line_orb;
 
@@ -87,19 +99,21 @@ class Canvas
         int line_cY_b;
         
         // Flags
-        bool quit = false;
-        bool mouse_hold = false;
-        bool zoom = false;
-        bool zoom_quit = false;
-        bool zoom_clear = false;
         bool line_hold = false;
         bool line_quit = false;
         bool line_run = false;
+        bool mouse_hold = false;
+        bool quit = false;
+        bool save_orbit = false;
+        bool undo_orbit = false;
+        bool zoom = false;
+        bool zoom_quit = false;
+        bool zoom_clear = false;
         
         int line_pts = 0;
         int max_line_pts = 50;
         int line_iter = 0;
-        int line_iter_max = 1e4;
+        int line_iter_max = 6e3;
 
         // Drawing colors
         Uint8 lineR = 255;

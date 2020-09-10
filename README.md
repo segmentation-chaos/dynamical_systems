@@ -16,14 +16,22 @@ The first library `libsdl2-dev` is the Simple DirectMedia Layer with development
 The second library `libsdl2-image-dev` is the sub library for image loading, required for textures and external images.
 The third library `libsdl2-ttf-dev` is the sub library for text loading.
 
-## Current maps
+# Current maps
+## 2D maps
 * Halley
 * Hénon
 * Simplified Fermi-Ulam model
 * Standard
 * Standard nontwist 
 
-## Analysis tools
+## 1D maps
+* Linear sine 
+* Logistic
+* Logistic (2nd order)
+* Moran
+* Triangle
+
+## Features
 * Orbit 
 * Phase space
 * Interactive phase space (clickSpace)
@@ -31,11 +39,19 @@ The third library `libsdl2-ttf-dev` is the sub library for text loading.
 
 ## ClickSpace commands
 * Left click (hold): run orbit for click initial point
-* Right click (hold): open zoom window (zoom in when released)
+* Right click: open zoom window (zoom in with Left click)
+* x: delete last orbit
+* p: save orbit into file -> `results/map_name`
 * c: total zoom out
 * r: creates initial condition line
 * s: destroy initial condition line
+* e: run dynamics for initial condition line points
 * Scrool up|down: increases|decreases the number of points in initial condition line
+
+## CobWeb commands
+* Left click (hold): run cob web iteration
+* w: increase map parameter (par[0])
+* s: decrease map parameter (par[0])
 
 ## Future developments
 * Fully contained graphical interface

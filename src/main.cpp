@@ -9,6 +9,51 @@
 
 int main(int argc, char **argv)
 {
+	/* 1D maps */
+	Maps_1d *map_1d_1, *map_1d_2, *map_1d_3, *map_1d_4, *map_1d_5;
+	
+	Log_map log;
+	Moran_map mor;
+	Triang_map tri;
+	Log_map_2ndO log_2;
+	Lin_sin_map lsin;
+	
+	map_1d_1 = &log;
+	map_1d_2 = &mor;
+	map_1d_3 = &tri;
+	map_1d_4 = &log_2;
+	map_1d_5 = &lsin;
+	log.par[0] = 3.0;
+	mor.par[0] = 1.5;
+	tri.par[0] = 1.0;
+	log_2.par[0] = 3.0;
+	lsin.par[0] = 1.0;
+
+	/* Orbit settings */
+	Analysis orb_1d_1, orb_1d_2, orb_1d_3, orb_1d_4, orb_1d_5;
+	
+	orb_1d_1.x0 = 0.1;
+	orb_1d_1.iter_num = 500;
+	orb_1d_1.orbit_1d(map_1d_1);
+
+	orb_1d_2.x0 = 0.1;
+	orb_1d_2.iter_num = 500;
+	orb_1d_2.orbit_1d(map_1d_2);
+
+	orb_1d_3.x0 = 0.1;
+	orb_1d_3.iter_num = 500;
+	orb_1d_3.orbit_1d(map_1d_3);
+
+	orb_1d_4.x0 = 0.1;
+	orb_1d_4.iter_num = 500;
+	orb_1d_4.orbit_1d(map_1d_4);
+
+	orb_1d_5.x0 = 0.1;
+	orb_1d_5.iter_num = 500;
+	orb_1d_5.orbit_1d(map_1d_5);
+
+
+	/* 2D maps */
 	Maps_2d *map_1, *map_2, *map_3, *map_4, *map_5;
 	
 	Std_map std;
@@ -24,7 +69,7 @@ int main(int argc, char **argv)
 
 	/* Map settings */
 	std.par[0] = 1.5;
-	hen.par[0] = 1.4;
+	hen.par[0] = 1.5;
 	hen.par[1] = 0.3;
 	ntwst.par[0] = 0.615;
 	ntwst.par[1] = 0.4;
@@ -59,11 +104,6 @@ int main(int argc, char **argv)
 	orb_5.y0 = 0.01;
 	orb_5.iter_num = 1e4;
 	orb_5.orbit_2d(map_5);
-
-	/* Map settings */
-	std.par[0] = 1.5;
-	hen.par[0] = 0.3;
-	hen.par[1] = 1.0;
 
 	/* Phase space settings*/
 	Analysis ps_1, ps_2, ps_3, ps_4, ps_5;
@@ -122,19 +162,43 @@ int main(int argc, char **argv)
 	/******************************/
 	/*** ClickSpace application ***/
 	/******************************/
-	int running = 1;
 	const int SCR_WIDTH = 1000;
-	const int SCR_HEIGHT = 800;
-	System sys(SCR_WIDTH, SCR_HEIGHT, map_1, ps_1);
+	const int SCR_HEIGHT = 900;
+	System sys(SCR_WIDTH, SCR_HEIGHT);
 
-	// Set new map and Analysis features (x,y limits)
-	sys.setMap(map_1);
-	sys.setAnalysis(ps_1);
+	// Set 2d map and Analysis features (x,y limits)
+	sys.setMap(map_3);
+	sys.setAnalysis(ps_3);
+	
+	// Set 1d map and Analysis features
+	Analysis map_1d_anal;
+	map_1d_anal.x_min = -0.01;
+	map_1d_anal.x_max =  1.00;
+	map_1d_anal.y_min = -0.01;
+	map_1d_anal.y_max =  1.10;
+	sys.setMap_1d(map_1d_4);
+	// sys.setAnalysis(map_1d_anal);
 
-	while (running)
+	// Choose which application to run
+	sys.running_map_2d = 1;
+	sys.running_cobweb = 0;
+
+	while (sys.running_sys)
 	{
-		running = sys.run();
+		// In future implementations, 
+		// a menu will handle applications
+		while (sys.running_map_2d)
+		{
+			sys.running_map_2d = sys.run_map_2d();
+		}
+		
+		while (sys.running_cobweb)
+		{
+			sys.running_cobweb = sys.run_cobweb();
+		}
+		
+		sys.running_sys = 0;
 	} 
 
-	return 0;
+	return sys.sys_quit();
 }

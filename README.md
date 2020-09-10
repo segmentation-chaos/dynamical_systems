@@ -25,10 +25,12 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 ## ClickSpace commands
 * Left click (hold): run orbit for click initial point
 * Right click: open zoom window (zoom in with Left click)
+* x: delete last orbit
 * p: save orbit into file -> `results/map_name`
 * c: total zoom out
 * r: creates initial condition line
 * s: destroy initial condition line
+* e: run dynamics for initial condition line points
 * Scrool up|down: increases|decreases the number of points in initial condition line
 
 ## CobWeb commands

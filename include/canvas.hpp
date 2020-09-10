@@ -65,6 +65,7 @@ class Canvas
         int canvas_quit();
 
         // Orbit points
+        vector<int> orb_sizes;
         vector<vector<double>> orb_ics;
         vector<vector<double>> orb_pts;
         vector<vector<double>> line_orb;
@@ -104,6 +105,7 @@ class Canvas
         bool mouse_hold = false;
         bool quit = false;
         bool save_orbit = false;
+        bool undo_orbit = false;
         bool zoom = false;
         bool zoom_quit = false;
         bool zoom_clear = false;
@@ -111,7 +113,7 @@ class Canvas
         int line_pts = 0;
         int max_line_pts = 50;
         int line_iter = 0;
-        int line_iter_max = 1e4;
+        int line_iter_max = 6e3;
 
         // Drawing colors
         Uint8 lineR = 255;

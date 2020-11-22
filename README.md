@@ -2,7 +2,7 @@ Development of a comprehensive and interactive tool for analyzing dynamical syst
 
 The code for `dynamical_systems` is made entirely in C/C++ and based on the olcPixelGameEngine graphical library, as made available by Javidx9 (for whom the authors are deeply grateful). The engine licences are kept in 'LICENSES' folder, along with its original README file 'https://github.com/OneLoneCoder/olcPixelGameEngine'. 
 
-The current version runs in linux OS but is may be easily ported to Windows.
+The current version runs in linux OS but it may be easily ported to Windows.
 
 Authors: M. Lazarotto; V. de Oliveira; M. Palmero (Last update 20/11/2020)
 

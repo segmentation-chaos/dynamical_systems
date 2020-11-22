@@ -7,10 +7,10 @@ The current version runs in linux OS but it may be easily ported to Windows.
 Authors: M. Lazarotto; V. de Oliveira; M. Palmero (Last update 20/11/2020)
 
 ## Run
-To run dyn_sys, just type `make` in `dynamical_systems/` folder to compile it and `vblank_mode=0 ./dyn_sys` to run it. `make clean` will delete the executable. The `vblank_mode=0' is used in ubuntu to unlock the frame rate. Otherwise it may work but with fixed 60 fps.
+To run the programm, just type `make` in `dynamical_systems/` folder to compile it and `vblank_mode=0 ./dyn_sys` to run it. `make clean` will delete the executable. The `vblank_mode=0` is used in ubuntu to unlock the frame rate. Otherwise it shall work but with fixed 60 fps.
 
-## Install
-In order to install dyn_sys, one must have the c++17 compiler. 
+## Installation requirements
+In order to install Dynamical Systems, one must have the c++17 compiler previously installed. 
 
 # Current maps
 ## 2D maps

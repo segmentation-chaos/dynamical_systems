@@ -1,5 +1,16 @@
-# dynamical_systems
-Development of a comprehensive tool for analyzing dynamical systems by graduate students of the Oscillations Control Group (Institute of Physics of the University of São Paulo).
+Development of a comprehensive and interactive tool for analyzing dynamical systems (2D and 1D maps) made by students of the Oscillations Control Group (http://portal.if.usp.br/controle/), Institute of Physics of the University of São Paulo, Brazil. 
+
+The code for `dynamical_systems` is made entirely in C/C++ and based on the olcPixelGameEngine graphical library, as made available by Javidx9 (for whom the authors are deeply grateful). The engine licences are kept in 'LICENSES' folder, along with its original README file 'https://github.com/OneLoneCoder/olcPixelGameEngine'. 
+
+The current version runs in linux OS but is may be easily ported to Windows.
+
+Authors: M. Lazarotto; V. de Oliveira; M. Palmero (Last update 20/11/2020)
+
+## Run
+To run dyn_sys, just type `make` in `dynamical_systems/` folder to compile it and `vblank_mode=0 ./dyn_sys` to run it. `make clean` will delete the executable. The `vblank_mode=0' is used in ubuntu to unlock the frame rate. Otherwise it may work but with fixed 60 fps.
+
+## Install
+In order to install dyn_sys, one must have the c++17 compiler. 
 
 # Current maps
 ## 2D maps
@@ -17,34 +28,33 @@ Development of a comprehensive tool for analyzing dynamical systems by graduate 
 * Triangle
 
 ## Features
-* Orbit 
-* Phase space
-* Interactive phase space (clickSpace)
-* Winding number
+* 2D interactive phase-space
+* 1D interactive plot (Cob Web)
 
 ## ClickSpace commands
-* Left click (hold): run orbit for click initial point
-* Right click: open zoom window (zoom in with Left click)
-* x: delete last orbit
-* p: save orbit into file -> `results/map_name`
-* c: total zoom out
-* r: creates initial condition line
-* s: destroy initial condition line
-* e: run dynamics for initial condition line points
-* Scrool up|down: increases|decreases the number of points in initial condition line
+* Left click (hold): run orbit for clicked initial point
+* Right click: open zoom window 
+** (When zooming: Left click to set zoom)
+* C: total zoom out
+* X: delete last orbit
+* Ctrl + X: delete all orbits
+* Ctrl + S: Save all orbits (file in -> `results/map_name`)
+* R: creates initial condition line
+* S: destroy initial condition line
+* SPACE: run dynamics for initial condition line points
+* Scrool UP|DOWN: increases|decreases the number of points in initial condition line
+* N: toggle night | light mode on and off.
 
 ## CobWeb commands
 * Left click (hold): run cob web iteration
 * w: increase map parameter (par[0])
 * s: decrease map parameter (par[0])
 
-## Install
-To install dyn_sys, just type `make` in `dynamical_systems/` folder and `./dyn_sys` to run it. `make clean` will delete the executable.
-
-In order to install dyn_sys, one must have the c++11 compiler available along with SDL2 C library, which is used for graphics. In case you have ubuntu, you can get the package directly from repository:
-
-`apt-get install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev`
-
-The first library `libsdl2-dev` is the Simple DirectMedia Layer with development version, which allows us to load `...hpp` files from it.
-The second library `libsdl2-image-dev` is the sub library for image loading, required for textures and external images.
-The third library `libsdl2-ttf-dev` is the sub library for text loading.
+## Future developments
+* Fully contained graphical interface
+* Bifurcation diagram
+* Billiards
+* Fractals
+* Celular automata
+* +Maps
+* +Analysis tools

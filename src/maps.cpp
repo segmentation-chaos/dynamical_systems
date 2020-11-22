@@ -186,7 +186,7 @@ int Lin_sin_map::evolve()
      * Domain: x -> (0.0, 1.0)
      *         w -> [0, inf]
      **/
-    out = 0.5 * (in + sin(par[0] * in));
+    out = in + 0.1 * sin(par[0] * in);
 
     return 0;
 }
@@ -196,25 +196,27 @@ int Log_map::set_par(double new_par)
     par[0] = new_par;
     return 0;
 }
+
 int Log_map_2ndO::set_par(double new_par)
 {
     par[0] = new_par;
-
     return 0;
 }
+
 int Moran_map::set_par(double new_par)
 {
     par[0] = new_par;
     return 0;
 }
+
 int Triang_map::set_par(double new_par)
 {
     par[0] = new_par;
     return 0;
 }
+
 int Lin_sin_map::set_par(double new_par)
 {
     par[0] = new_par;
-
     return 0;
 }

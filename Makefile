@@ -1,15 +1,27 @@
+# Folder with '.hpp' files (declarations)
 INCLUDE_DIR=./include
-CXXFLAGS=-Wall -I$(INCLUDE_DIR) #-Werror -O3
+
+# Folder with '.cpp' files (definitions)
 VPATH=./src
 
-TARGETS=dyn_sys
+# Compilation flags
+CXXFLAGS=-std=c++17 -Wall -I$(INCLUDE_DIR)
 
-DEPENDENCIES=main.cpp maps.cpp features.cpp canvas.cpp system.cpp
+# Linked libraries
+LINKFLAGS=-lX11 -lGL -lpthread -lpng -lstdc++fs
+
+# Files to be included
+DEPENDENCIES=main.cpp olcPixelGameEngine.cpp clickspace.cpp\
+			 retromenu.cpp menuobject.cpp menumanager.cpp\
+			 maps.cpp features.cpp app2Dmaps.cpp app1Dmaps.cpp
+
+# Executable
+TARGETS=dyn_sys
 
 build: $(TARGETS)
 
-$(TARGETS): $(DEPENDENCIES) -lSDL2
-	$(CXX) $(CXXFLAGS) -o dyn_sys $^
+$(TARGETS): $(DEPENDENCIES)
+	$(CXX) $(CXXFLAGS) -o $(TARGETS) $^ $(LINKFLAGS)
 
 .PHONY: clean
 clean:

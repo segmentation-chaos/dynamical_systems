@@ -3,4 +3,5 @@
    multiple definition errors from PGE. 
 */
 #define OLC_PGE_APPLICATION
+#include <stddef.h>
 #include "olcPixelGameEngine.h"

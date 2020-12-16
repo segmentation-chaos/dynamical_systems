@@ -1,3 +1,6 @@
+#ifndef RETRO_MENU_H
+#define RETRO_MENU_H
+
 #include "command_ids.h"
 #include "menumanager.h"
 #include "olcPixelGameEngine.h"
@@ -16,3 +19,5 @@ public:
 
     int run_frame(olc::PixelGameEngine& pge);
 };
+
+#endif

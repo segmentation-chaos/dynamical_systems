@@ -24,32 +24,32 @@ app1DMap::app1DMap()
     log2->par[0] = 3.0;
 
     /* CobWeb space settings */
-    Analysis cb_1, cb_2, cb_3, cb_4, cb_5;
+    Analysis cb_log, cb_mor, cb_tri, cb_lsin, cb_log2;
 
-    cb_1.x_min = -0.01;
-	cb_1.x_max =  1.00;
-	cb_1.y_min = -0.01;
-	cb_1.y_max =  1.10;
+    cb_log.x_min = -0.01;
+	cb_log.x_max =  1.00;
+	cb_log.y_min = -0.01;
+	cb_log.y_max =  1.10;
 
-    cb_2.x_min = -0.01;
-	cb_2.x_max =  5.00;
-	cb_2.y_min = -0.01;
-	cb_2.y_max =  5.00;
+    cb_mor.x_min = -0.01;
+	cb_mor.x_max =  5.00;
+	cb_mor.y_min = -0.01;
+	cb_mor.y_max =  5.00;
 
-    cb_3.x_min = -0.01;
-	cb_3.x_max =  1.00;
-	cb_3.y_min = -0.01;
-	cb_3.y_max =  1.10;
+    cb_tri.x_min = -0.01;
+	cb_tri.x_max =  1.00;
+	cb_tri.y_min = -0.01;
+	cb_tri.y_max =  1.10;
 
-    cb_4.x_min = -0.01;
-	cb_4.x_max =  1.00;
-	cb_4.y_min = -0.01;
-	cb_4.y_max =  1.10;
+    cb_lsin.x_min = -0.01;
+	cb_lsin.x_max =  1.00;
+	cb_lsin.y_min = -0.01;
+	cb_lsin.y_max =  1.10;
 
-    cb_5.x_min = -0.01;
-	cb_5.x_max =  1.00;
-	cb_5.y_min = -0.01;
-	cb_5.y_max =  1.10;
+    cb_log2.x_min = -0.01;
+	cb_log2.x_max =  1.00;
+	cb_log2.y_min = -0.01;
+	cb_log2.y_max =  1.10;
 
     // Set Analysis and Maps to items
     map_items[log->check_id()] = log;
@@ -57,11 +57,11 @@ app1DMap::app1DMap()
     map_items[tri->check_id()] = tri;
     map_items[lsin->check_id()] = lsin;
     map_items[log2->check_id()] = log2;
-    analysis_items[log->check_id()] = cb_1;
-    analysis_items[mor->check_id()] = cb_2;
-    analysis_items[tri->check_id()] = cb_3;
-    analysis_items[lsin->check_id()] = cb_4;
-    analysis_items[log2->check_id()] = cb_5;
+    analysis_items[log->check_id()] = cb_log;
+    analysis_items[mor->check_id()] = cb_mor;
+    analysis_items[tri->check_id()] = cb_tri;
+    analysis_items[lsin->check_id()] = cb_lsin;
+    analysis_items[log2->check_id()] = cb_log2;
 }
 
 app1DMap::~app1DMap() {}
@@ -86,6 +86,8 @@ void app1DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
     sAxOrigin.y = 0.0;
     sAxSize.x = sPosMax.x - sPosMin.x;
     sAxSize.y = sPosMax.y - sPosMin.y;
+
+    fWorldPerScreenWidthPixel = (sPosMax.x - sPosMin.x) / pge.ScreenWidth();
 }
 
 void app1DMap::CanvasToSystem()
@@ -102,14 +104,19 @@ void app1DMap::SystemToCanvas()
 
 void app1DMap::DrawFunction(olc::PixelGameEngine& pge)
 {
-    for (int p = 0; p < FunctionPts; p++)
+    sPos = sPosMin;
+    SystemToCanvas();
+    olc::vi2d pb = cPos;
+
+    for (double x = sPosMin.x; x < sPosMax.x; x += fWorldPerScreenWidthPixel)
     {
-        sPos.x = ((double) p / FunctionPts) * fabs(sPosMax.x - sPosMin.x);
-        map->in = sPos.x;
+        sPos.x = x;
+        map->in = x;
         map->evolve();
         sPos.y = map->out;
         SystemToCanvas();
-        pge.Draw(cPos, functionRGBA);
+        pge.DrawLine(pb, cPos, functionRGBA);
+        pb = cPos;
     }
 }
 
@@ -189,6 +196,7 @@ int app1DMap::run_frame(olc::PixelGameEngine& pge)
     DrawIdentity(pge);
     DrawAxes(pge);
     DrawFunction(pge);
+    pge.DrawString(20, 20, map->check_id() + " (" + std::to_string(map->get_iter_order()) + " order)", olc::BLACK, 2);
 
     /* Handle Key events */
     // Return to menu
@@ -223,9 +231,20 @@ int app1DMap::run_frame(olc::PixelGameEngine& pge)
         }
     }
 
+    // Set iteration order
+    if (pge.GetKey(olc::Key::K1).bPressed) { map->set_iter_order(1); }
+    if (pge.GetKey(olc::Key::K2).bPressed) { map->set_iter_order(2); }
+    if (pge.GetKey(olc::Key::K3).bPressed) { map->set_iter_order(3); }
+    if (pge.GetKey(olc::Key::K4).bPressed) { map->set_iter_order(4); }
+    if (pge.GetKey(olc::Key::K5).bPressed) { map->set_iter_order(5); }
+    if (pge.GetKey(olc::Key::K6).bPressed) { map->set_iter_order(6); }
+    if (pge.GetKey(olc::Key::K7).bPressed) { map->set_iter_order(7); }
+    if (pge.GetKey(olc::Key::K8).bPressed) { map->set_iter_order(8); }
+    if (pge.GetKey(olc::Key::K9).bPressed) { map->set_iter_order(9); }
+
     // If mouse is holding
     if (pge.GetMouse(0).bHeld) 
-    {  
+    {
         DrawCobWeb(pge);
     }
 

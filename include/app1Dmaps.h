@@ -30,8 +30,8 @@ private:
     void DrawAxes(olc::PixelGameEngine& pge);
 
     // Calculation limits
-    int32_t FunctionPts = 15000;
-    int32_t CobWebIter  = 500;
+    double fWorldPerScreenWidthPixel;
+    int32_t CobWebIter = 500;
 
     // Canvas coordinates
     olc::vi2d cPos;

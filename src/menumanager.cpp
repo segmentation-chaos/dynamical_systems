@@ -94,3 +94,8 @@ menuobject* menumanager::OnConfirm()
 
     return nullptr;   
 }
+
+int menumanager::GetPanelsSize()
+{
+    return panels.size();
+}

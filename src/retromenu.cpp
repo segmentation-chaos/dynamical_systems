@@ -1,42 +1,11 @@
 #include "retromenu.h"
 
-RetroMenu::RetroMenu()
-{
-    // Load Sprites
-    sprGFX = new olc::Sprite("./files/sprites/RetroMenuSprite.png");
-    sprLOGO = new olc::Sprite("./files/sprites/MenuLogoSprite.png");
-        
-    // Create Menu Tree
-    mo["main"].SetID(10000).SetTable(1, 5);
-
-    mo["main"]["2D Map"].SetTable(1, 4);
-    auto& menuPick2DMap = mo["main"]["2D Map"];
-    menuPick2DMap["Fermi-Ulam"].SetID(SET_2DMAP_FERMIULAM);
-    menuPick2DMap["Halley"].SetID(SET_2DMAP_HALLEY);
-    menuPick2DMap["Henon"].SetID(SET_2DMAP_HENON);
-    menuPick2DMap["Standard"].SetID(SET_2DMAP_STANDARD);
-    menuPick2DMap["Standard Non-Twist"].SetID(SET_2DMAP_STDNONTWST);
-
-    mo["main"]["1D Map"].SetTable(1, 4);
-    auto& menuPick1DMap = mo["main"]["1D Map"];
-    menuPick1DMap["Linear Sine"].SetID(SET_1DMAP_LINEARSIN);
-    menuPick1DMap["Logistic"].SetID(SET_1DMAP_LOGISTIC);
-    menuPick1DMap["Logistic (2nd Order)"].SetID(SET_1DMAP_LOGISTIC2ND);
-    menuPick1DMap["Moran"].SetID(SET_1DMAP_MORAN);
-    menuPick1DMap["Triangular"].SetID(SET_1DMAP_TRIANGLE);
-    
-    mo["main"]["Buy DLC"].Enable(false);
-    mo["main"]["Donate"].Enable(false);
-    mo["main"]["Exit"].SetID(EXIT_ALL);
-
-    mo.Build();
-
-    mm.Open(&mo["main"]);
-}
+RetroMenu::RetroMenu() {}
 
 int RetroMenu::run_frame(olc::PixelGameEngine& pge)
 {
-    pge.Clear(olc::Pixel(204, 229, 255));
+    // pge.Clear(olc::Pixel(204, 229, 255));
+    pge.Clear(olc::Pixel( 50,  50,  55));
     menuobject* command = nullptr;
 
     // Handle Key events   
@@ -45,14 +14,15 @@ int RetroMenu::run_frame(olc::PixelGameEngine& pge)
     if (pge.GetKey(olc::Key::DOWN).bPressed)  { mm.OnDown();  }
     if (pge.GetKey(olc::Key::LEFT).bPressed)  { mm.OnLeft();  }
     if (pge.GetKey(olc::Key::RIGHT).bPressed) { mm.OnRight(); }
-    if (pge.GetKey(olc::Key::Z).bPressed)     { mm.OnBack();  }
+    if (pge.GetKey(olc::Key::Z).bPressed ||
+        pge.GetKey(olc::Key::ESCAPE).bPressed){ mm.OnBack();  }
     if (pge.GetKey(olc::Key::SPACE).bPressed ||
         pge.GetKey(olc::Key::ENTER).bPressed) { command = mm.OnConfirm(); }
 
     // Handle command
     if (command != nullptr)
     {
-        sLastAction = "Selected: " + command->GetName() + "ID: " + std::to_string(command->GetID());
+        sLastAction = "Selected: " + command->GetName() + " ID: " + std::to_string(command->GetID());
         mm.Close();
 
         return command->GetID();
@@ -67,12 +37,18 @@ int RetroMenu::run_frame(olc::PixelGameEngine& pge)
     pge.SetPixelMode(currentPixelMode);
         
     // Print Current Version
-    pge.DrawString(0.78 * pge.ScreenWidth(), 0.97 * pge.ScreenHeight(), "Version 0.0.1", olc::DARK_GREY, 2);
+    std::string sVersion = "Version 0.0.1";
+    int sVersionSize = sVersion.size();
+    pge.DrawString(pge.ScreenWidth() - sVersionSize * 8 * 2, pge.ScreenHeight() - 8 * 2, sVersion, olc::DARK_GREY, 2);
+
+    // Print Engine Credit
+    std::string sEngine = "made with olcPixelGameEngine";
+    pge.DrawString(0, pge.ScreenHeight() - 8 * 2, sEngine, olc::DARK_GREY, 2);
 
     // Draw Menu
     olc::vi2d PanelSize = nPatch * mo["main"].GetSizeInPatches();
     mm.Draw(pge, sprGFX, {(pge.ScreenWidth() - PanelSize.x) / 2, 
-                          (pge.ScreenHeight() - PanelSize.y) / 2});
+                          (pge.ScreenHeight() - PanelSize.y) / 2 + 20});
 
     // Print last command
     pge.DrawString(10, 0.97 * pge.ScreenHeight(), sLastAction, olc::BLACK, 2);

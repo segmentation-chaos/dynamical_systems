@@ -39,6 +39,9 @@ In order to install dyn_sys, one must have the c++17 compiler.
 * X: delete last orbit
 * Ctrl + X: delete all orbits
 * Ctrl + S: Save all orbits (file in -> `results/map_name`)
+* Ctrl + Left Mouse (hold and drag): Pan around the screen
+* Scrool UP: Zoom in
+* Scrool DOWN: Zoom out
 * R: creates initial condition line
 * S: destroy initial condition line
 * SPACE: run dynamics for initial condition line points

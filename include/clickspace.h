@@ -2,6 +2,7 @@
 #include "retromenu.h"
 #include "app2Dmaps.h"
 #include "app1Dmaps.h"
+#include "appCellularAutomata.h"
 
 class olcClickSpace : public olc::PixelGameEngine
 {
@@ -16,6 +17,13 @@ public:
     app2DMap map2D;
     // Iteractive 1D map (cobweb)
     app1DMap map1D;
+    // Iteractive Conway's Game of Life 
+    appCellularAutomata cellauto;
+
+    // Credits Screen
+    int run_credits();
+    olc::Sprite* sprLogoIFUSP = nullptr;
+    olc::Sprite* sprLogoUSP   = nullptr;
 
     bool OnUserCreate() override;
     bool OnUserUpdate(float fElapsedTime) override;

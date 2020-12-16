@@ -15,6 +15,8 @@ public:
     void OnRight();
     void OnBack();
 
+    int GetPanelsSize();
+
     menuobject* OnConfirm();
     
     void Draw(olc::PixelGameEngine& pge, olc::Sprite* sprGFX, olc::vi2d vScreenOffset);

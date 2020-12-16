@@ -18,6 +18,10 @@
 /* Ctrl + X: delete all orbits        */
 /* Ctrl + S: Save current orbits      */
 /*        (file in results/map_name/) */
+/* Ctrl + Left Click (hold and drag): */
+/*        Pan Screen                  */
+/* Scrool UP: Zoom in                 */
+/* Scrool DOWN: Zoom out              */
 /* R: Start line of init. cond. pts   */
 /* (In line) Scrool up: increase pts  */
 /* (In line) Scrool down: decrease pts*/
@@ -78,7 +82,7 @@ int main()
 {
     // App window settings
     olcClickSpace application;
-    int32_t ScreenWidth = 1200;
+    int32_t ScreenWidth = 1400;
     int32_t ScreenHeight = 1000;
  
     // Main game loop  

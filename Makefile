@@ -13,10 +13,11 @@ LINKFLAGS=-lX11 -lGL -lpthread -lpng -lstdc++fs
 # Files to be included
 DEPENDENCIES=main.cpp olcPixelGameEngine.cpp clickspace.cpp\
 			 retromenu.cpp menuobject.cpp menumanager.cpp\
-			 maps.cpp features.cpp app2Dmaps.cpp app1Dmaps.cpp
+			 maps.cpp features.cpp app2Dmaps.cpp app1Dmaps.cpp\
+			 appCellularAutomata.cpp colorwheel.cpp
 
 # Executable
-TARGETS=dyn_sys
+TARGETS=click_space
 
 build: $(TARGETS)
 

@@ -18,8 +18,8 @@ app2DMap::app2DMap()
 	
     /* Map Default Parameters */
 	std->par[0] = 1.5;
-	hen->par[0] = 1.0;
-	hen->par[1] = 0.5;
+	hen->par[0] = 0.25;
+	hen->par[1] = 1.0;
 	ntw->par[0] = 0.615;
 	ntw->par[1] = 0.4;
 	ntw->par[2] = 2;
@@ -27,32 +27,32 @@ app2DMap::app2DMap()
 	sfm->par[0] = 0.001;
 
     /* Phase space settings*/
-	Analysis ps_1, ps_2, ps_3, ps_4, ps_5;
+	Analysis ps_std, ps_hen, ps_ntw, ps_hal, ps_sfm;
 
-	ps_1.x_min =  0.0;
-	ps_1.x_max =  1.0;
-	ps_1.y_min = -0.5;
-	ps_1.y_max =  0.5;
+	ps_std.x_min =  0.0;
+	ps_std.x_max =  1.0;
+	ps_std.y_min = -0.5;
+	ps_std.y_max =  0.5;
 
-	ps_2.x_min = -2.0;
-	ps_2.x_max =  2.0;
-	ps_2.y_min = -2.0;
-	ps_2.y_max =  2.0;
+	ps_hen.x_min = -1.5;
+	ps_hen.x_max =  1.5;
+	ps_hen.y_min = -1.5;
+	ps_hen.y_max =  1.5;
 
-	ps_3.x_min = -0.5;
-	ps_3.x_max =  0.5;
-	ps_3.y_min = -0.5;
-	ps_3.y_max =  0.5;
+	ps_ntw.x_min = -0.5;
+	ps_ntw.x_max =  0.5;
+	ps_ntw.y_min = -0.5;
+	ps_ntw.y_max =  0.5;
 
-	ps_4.x_min =  0.0;
-	ps_4.x_max =  2.0 * M_PI;
-	ps_4.y_min =  2.0;
-	ps_4.y_max =  6.0;
+	ps_hal.x_min =  0.0;
+	ps_hal.x_max =  2.0 * M_PI;
+	ps_hal.y_min =  2.0;
+	ps_hal.y_max =  6.0;
 
-	ps_5.x_min =  0.0;
-	ps_5.x_max =  2.0 * M_PI;
-	ps_5.y_min =  0.0;
-	ps_5.y_max =  0.2;
+	ps_sfm.x_min =  0.0;
+	ps_sfm.x_max =  2.0 * M_PI;
+	ps_sfm.y_min =  0.0;
+	ps_sfm.y_max =  0.2;
 
     // Set Analysis and Maps to map
     map_items[std->check_id()] = std;
@@ -60,17 +60,27 @@ app2DMap::app2DMap()
     map_items[ntw->check_id()] = ntw;
     map_items[hal->check_id()] = hal;
     map_items[sfm->check_id()] = sfm;
-    analysis_items[std->check_id()] = ps_1;
-    analysis_items[hen->check_id()] = ps_2;
-    analysis_items[ntw->check_id()] = ps_3;
-    analysis_items[hal->check_id()] = ps_4;
-    analysis_items[sfm->check_id()] = ps_5;
+    analysis_items[std->check_id()] = ps_std;
+    analysis_items[hen->check_id()] = ps_hen;
+    analysis_items[ntw->check_id()] = ps_ntw;
+    analysis_items[hal->check_id()] = ps_hal;
+    analysis_items[sfm->check_id()] = ps_sfm;
 }
 
-app2DMap::~app2DMap() {}
+app2DMap::~app2DMap() 
+{
+    ClearSystemData();
+}
 
 void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
 {
+    // Set Initial flags state
+    run_color_canvas = false;
+    run_color_orbit = false;
+    clear_orbits = false;
+    clear_frame = false;
+    quit = false;
+
     // Set canvas dimensions
     cSize.x = pge.ScreenWidth();
     cSize.y = pge.ScreenHeight();
@@ -87,24 +97,73 @@ void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
     sPosMax.y = anal->y_max;
     sPosScaleMin = sPosMin;
     sPosScaleMax = sPosMax;
+    sScale = {(sPosScaleMax.x - sPosScaleMin.x) / (double)pge.ScreenWidth(), 
+              (sPosScaleMax.y - sPosScaleMin.y) / (double)pge.ScreenHeight()};
 
     // Allocate vectors
     orb_chunks.resize(1, 0);
     orb_ics.resize(2, std::vector<double>(0));
     orb_pts.resize(2, std::vector<double>(0));
     line_orb.resize(2, std::vector<double>(0));
+
+    // Create local menu
+    local_menu.sprGFX = new olc::Sprite("./files/sprites/RetroMenuSprite.png");
+
+    local_menu.mo["main"].SetID(LOCAL_2DMAP_MENU).SetTable(1, 1);
+    
+    local_menu.mo["main"]["Menu(M)"].SetTable(1, 7);
+    auto& localMenuMain = local_menu.mo["main"]["Menu(M)"];
+    
+    localMenuMain["Set Color"].SetID(LOCAL_2DMAP_SETCOLOR).SetTable(1, 2);
+    auto& localMenuSetColor = localMenuMain["Set Color"];
+    localMenuSetColor["Set Color Orbit"].SetID(LOCAL_2DMAP_SETCOLOR_ORBIT);
+    localMenuSetColor["Set Color Canvas"].SetID(LOCAL_2DMAP_SETCOLOR_CANVAS);
+    localMenuSetColor["Set Nightmode"].SetID(LOCAL_2DMAP_SETCOLOR_NIGHTMODE);
+    localMenuSetColor["Set Lightmode"].SetID(LOCAL_2DMAP_SETCOLOR_LIGHTMODE);
+    
+    localMenuMain["Set Parameter"].SetID(LOCAL_2DMAP_SETPARAMETER).Enable(false);
+    localMenuMain["Set Point"].SetID(LOCAL_2DMAP_SETPOINT).Enable(false);
+    localMenuMain["Set Axis"].SetID(LOCAL_2DMAP_SETAXIS).Enable(false);
+    localMenuMain["Set Grid"].SetID(LOCAL_2DMAP_SETGRID).Enable(false);
+    
+    localMenuMain["Set Map"].SetID(LOCAL_2DMAP_SETMAP).SetTable(1, 2);
+    auto& localMenuSetMap = localMenuMain["Set Map"];
+    localMenuSetMap["Custom Map"].SetID(LOCAL_2DMAP_SETCUSTOMMAP).Enable(false);
+    localMenuSetMap["Library"].SetID(LOCAL_2DMAP_SETMAP_LIBRARY).SetTable(1, 4);
+    auto& localMenuSetMapLibrary = localMenuSetMap["Library"];
+    localMenuSetMapLibrary["Fermi-Ulam"].SetID(SET_2DMAP_FERMIULAM);
+    localMenuSetMapLibrary["Halley"].SetID(SET_2DMAP_HALLEY);
+    localMenuSetMapLibrary["Henon"].SetID(SET_2DMAP_HENON);
+    localMenuSetMapLibrary["Standard"].SetID(SET_2DMAP_STANDARD);
+    localMenuSetMapLibrary["Standard Non-Twist"].SetID(SET_2DMAP_STDNONTWST);
+    
+    localMenuMain["Controls"].SetID(LOCAL_2DMAP_CONTROLS).Enable(false);
+    localMenuMain["Center Frame"].SetID(LOCAL_2DMAP_CLEAR_FRAME);
+    localMenuMain["Reset Orbits"].SetID(LOCAL_2DMAP_CLEAR_ORBITS);
+    localMenuMain["Reset"].SetID(LOCAL_2DMAP_CLEAR);
+    localMenuMain["Save Orbits"].SetID(LOCAL_2DMAP_SAVE_ORBITS);
+    localMenuMain["Exit"].SetID(LOCAL_2DMAP_EXIT);
+
+    local_menu.mo.Build();
+    local_menu.mm.Open(&local_menu.mo["main"]);
+    
+    pge.SetPixelMode(olc::Pixel::NORMAL);
+
+    pointRGBA = { 255, 255, 255, 255};
+    backgroundRGBA = { 50,  50,  55, 255};
+    color_wheel.SetColorWheel(150, olc::vi2d{0, 300});
 }
 
 void app2DMap::CanvasToSystem()
 {
-    sPos.x = fabs(sPosScaleMax.x - sPosScaleMin.x) * ((double) cPos.x / (double) cSize.x) + sPosScaleMin.x;
-    sPos.y = fabs(sPosScaleMax.y - sPosScaleMin.y) * ((double) (cSize.y - cPos.y) / (double) cSize.y) + sPosScaleMin.y;
+    sPos.x = fabs(sPosScaleMax.x - sPosScaleMin.x) * ((double) cPos.x / (double) cSize.x) + sPosScaleMin.x + sOffset.x;
+    sPos.y = fabs(sPosScaleMax.y - sPosScaleMin.y) * ((double) (cSize.y - cPos.y) / (double) cSize.y) + sPosScaleMin.y - sOffset.y;
 }
 
 void app2DMap::SystemToCanvas()
 {
-    cPos.x = (int) cSize.x * (sPos.x - sPosScaleMin.x) / fabs(sPosScaleMax.x - sPosScaleMin.x);
-    cPos.y = (int) cSize.y * (1.0 - ((sPos.y - sPosScaleMin.y) / fabs(sPosScaleMax.y - sPosScaleMin.y)));
+    cPos.x = (int) cSize.x * (sPos.x - sPosScaleMin.x - sOffset.x) / fabs(sPosScaleMax.x - sPosScaleMin.x);
+    cPos.y = (int) cSize.y * (1.0 - ((sPos.y - sPosScaleMin.y + sOffset.y) / fabs(sPosScaleMax.y - sPosScaleMin.y)));
 }
 
 void app2DMap::SetNewScale()
@@ -137,6 +196,47 @@ void app2DMap::SetNewScale()
 
     sPosScaleMin = sPosScaleMinNew;
     sPosScaleMax = sPosScaleMaxNew;
+
+    sScale = {(sPosScaleMax.x - sPosScaleMin.x) / (double) cSize.x, 
+              (sPosScaleMax.y - sPosScaleMin.y) / (double) cSize.y};
+}
+
+void app2DMap::ZoomIn(olc::PixelGameEngine& pge)
+{
+    cPos = {pge.GetMouseX(), pge.GetMouseY()};
+    CanvasToSystem();
+    sMouseSystemLocBeforeZoom = sPos;
+
+    cZoomFrameA.x = (int) (0.05 * pge.ScreenWidth());
+    cZoomFrameA.y = (int) (0.05 * pge.ScreenHeight());
+    cZoomFrameB.x = (int) (0.95 * pge.ScreenWidth());
+    cZoomFrameB.y = (int) (0.95 * pge.ScreenHeight());
+    SetNewScale();
+
+    // Calculate Offset correction from Zooming
+    cPos = {pge.GetMouseX(), pge.GetMouseY()};
+    CanvasToSystem();
+    sOffset.x += (sMouseSystemLocBeforeZoom.x - sPos.x);
+    sOffset.y -= (sMouseSystemLocBeforeZoom.y - sPos.y);
+}
+
+void app2DMap::ZoomOut(olc::PixelGameEngine& pge)
+{
+    cPos = {pge.GetMouseX(), pge.GetMouseY()};
+    CanvasToSystem();
+    sMouseSystemLocBeforeZoom = sPos;
+
+    cZoomFrameA.x = (int) (-0.05 * pge.ScreenWidth());
+    cZoomFrameA.y = (int) (-0.05 * pge.ScreenHeight());
+    cZoomFrameB.x = (int) (1.05 * pge.ScreenWidth());
+    cZoomFrameB.y = (int) (1.05 * pge.ScreenHeight());
+    SetNewScale();
+
+    // Calculate Offset correction from Zooming
+    cPos = {pge.GetMouseX(), pge.GetMouseY()};
+    CanvasToSystem();
+    sOffset.x += (sMouseSystemLocBeforeZoom.x - sPos.x);
+    sOffset.y -= (sMouseSystemLocBeforeZoom.y - sPos.y);
 }
 
 void app2DMap::DrawPhasePoint(olc::PixelGameEngine& pge)
@@ -189,6 +289,12 @@ void app2DMap::DrawOrbits(olc::PixelGameEngine& pge)
     }
 }
 
+void app2DMap::DrawMenu(olc::PixelGameEngine& pge)
+{
+    // Draw Menu
+    local_menu.mm.Draw(pge, local_menu.sprGFX, {40, 20});
+}
+
 void app2DMap::IterateMapOnClick(olc::PixelGameEngine& pge)
 {
     map->evolve();
@@ -236,8 +342,8 @@ void app2DMap::IterateLinePts(olc::PixelGameEngine& pge)
     {
         line_orb[0].clear();
         line_orb[1].clear();
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
+        // pge.Clear(backgroundRGBA);
+        // DrawOrbits(pge);
             
         line_iter = 0;
         line_run  = false;
@@ -290,27 +396,96 @@ void app2DMap::SetLinePtsToRun(olc::PixelGameEngine& pge)
     orb_chunks.push_back(orb_size);
 }
 
+void app2DMap::ClearSystemData()
+{
+    orb_chunks.clear();
+    orb_ics[0].clear();
+    orb_ics[1].clear();
+    orb_pts[0].clear();
+    orb_pts[1].clear();
+    line_orb[0].clear();
+    line_orb[1].clear();
+}
+
+void app2DMap::HandleLocalMenu(olc::PixelGameEngine& pge)
+{
+    // Open Menu
+    if (local_menu.mm.GetPanelsSize() == 0)
+    {
+        local_menu.mm.Open(&local_menu.mo["main"]);
+    }
+
+    menuobject* command = nullptr;
+
+    if (pge.GetKey(olc::Key::UP).bPressed)    { local_menu.mm.OnUp();    }
+    if (pge.GetKey(olc::Key::DOWN).bPressed)  { local_menu.mm.OnDown();  }
+    if (pge.GetKey(olc::Key::LEFT).bPressed)  { local_menu.mm.OnLeft();  }
+    if (pge.GetKey(olc::Key::RIGHT).bPressed) { local_menu.mm.OnRight(); }
+    if (pge.GetKey(olc::Key::Z).bPressed)     { local_menu.mm.OnBack();  }
+    if (pge.GetKey(olc::Key::ENTER).bPressed || 
+        pge.GetKey(olc::Key::M).bPressed)     { command = local_menu.mm.OnConfirm(); }
+
+    // Handle command
+    if (command != nullptr)
+    {
+        // sLastAction = "Selected: " + command->GetName() + " ID: " + std::to_string(command->GetID());
+        local_menu.mm.Close();
+
+        switch (command->GetID())
+        {
+            case LOCAL_2DMAP_EXIT:
+                quit = true;
+                break;
+            case LOCAL_2DMAP_SETCOLOR_ORBIT:
+                run_color_orbit = true;
+                break;
+            case LOCAL_2DMAP_SETCOLOR_CANVAS:
+                run_color_canvas = true;
+                break;
+            case LOCAL_2DMAP_SETCOLOR_NIGHTMODE:
+                set_night_mode = true;
+                break;
+            case LOCAL_2DMAP_SETCOLOR_LIGHTMODE:
+                set_light_mode = true;
+                break;
+            case LOCAL_2DMAP_SAVE_ORBITS:
+                save_orbits = true;
+                break;
+            case LOCAL_2DMAP_CLEAR_ORBITS:
+                clear_orbits = true;
+                break;
+            case LOCAL_2DMAP_CLEAR_FRAME:
+                clear_frame = true;
+                break;
+            case LOCAL_2DMAP_CLEAR:
+                clear_frame = true;
+                clear_orbits = true;
+                break;
+        }
+
+        if (command->GetID() > SET_2DMAP && command->GetID() < LOCAL_2DMAP_MENU)
+        {
+            change_map = true;
+            set_map_ID = command->GetID();
+        }
+    }
+}
+
 int app2DMap::run_frame(olc::PixelGameEngine& pge)
 {
     pge.Clear(backgroundRGBA);
     DrawOrbits(pge);
+    HandleLocalMenu(pge);
 
-    /* Handle Key events */
-    // Return to menu
-    if (pge.GetKey(olc::Key::ESCAPE).bPressed) 
+    // Return to main menu
+    if (pge.GetKey(olc::Key::ESCAPE).bPressed || quit) 
     {
-        orb_chunks.clear();
-        orb_ics[0].clear();
-        orb_ics[1].clear();
-        orb_pts[0].clear();
-        orb_pts[1].clear();
-        line_orb[0].clear();
-        line_orb[1].clear();
+        ClearSystemData();
 
         return RUN_MENU; 
     }
    
-    // Toggle Night mode style
+    // Toggle night mode
     if (pge.GetKey(olc::Key::N).bPressed)
     {
         if (bNightMode)
@@ -327,9 +502,29 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         }
     }
     
+    // Handle Panning
+    olc::vi2d cMouse = {pge.GetMouseX(), pge.GetMouseY()};
+    if (pge.GetKey(olc::Key::CTRL).bHeld && 
+        pge.GetMouse(0).bPressed)
+    {
+        cStartPan = cMouse;
+    }
+    else if (pge.GetKey(olc::Key::CTRL).bHeld && 
+             pge.GetMouse(0).bHeld)
+    {
+        sOffset.x -= (double)(cMouse.x - cStartPan.x) * sScale.x;
+        sOffset.y -= (double)(cMouse.y - cStartPan.y) * sScale.y;
+        cStartPan = cMouse;
+        DrawOrbits(pge);
+    }
+
+    // Handle Zooming
+    if (pge.GetMouseWheel() > 0 && !line_hold) { ZoomIn(pge); }  // Corrects Offset
+    if (pge.GetMouseWheel() < 0 && !line_hold) { ZoomOut(pge); } // Corrects Offset
+
     // Iterate for mouse click
-    if (pge.GetMouse(0).bPressed && 
-        !zoom_hold && !line_hold)
+    if (pge.GetMouse(0).bPressed && !pge.GetKey(olc::Key::CTRL).bHeld &&
+        !zoom_hold && !line_hold && !run_color_orbit && !run_color_canvas)
     {
         cPos.x = pge.GetMouseX();
         cPos.y = pge.GetMouseY();
@@ -348,7 +543,8 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
 
         run_dynamics = true;
     }
-    else if (pge.GetMouse(0).bHeld)
+    else if (pge.GetMouse(0).bHeld && !pge.GetKey(olc::Key::CTRL).bHeld &&
+             !line_hold && !run_color_orbit && !run_color_canvas)
     {
         run_dynamics = true;
     }
@@ -358,8 +554,8 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
     }
    
     // Save Orbit
-    if (pge.GetKey(olc::Key::CTRL).bHeld && 
-        pge.GetKey(olc::Key::S).bPressed) 
+    if ((pge.GetKey(olc::Key::CTRL).bHeld && 
+         pge.GetKey(olc::Key::S).bPressed) || save_orbits) 
     {
         std::cout << "Orbit Saved from ";
         std::cout << map->check_id();
@@ -367,6 +563,7 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         std::cout << map->check_id();
         std::cout << "/canvas_orbit.dat" << std::endl;
         anal->save_orbit(map, orb_pts, orb_ics);
+        save_orbits = false;
     }
     
     // Delete last iterated orbit
@@ -382,38 +579,29 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
             orb_pts[0].resize(0);
             orb_pts[1].resize(0);
         }
-
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
     }
 
     // Delete all orbits
-    if (pge.GetKey(olc::Key::CTRL).bHeld &&
-        pge.GetKey(olc::Key::X).bPressed)
+    if ((pge.GetKey(olc::Key::CTRL).bHeld &&
+         pge.GetKey(olc::Key::X).bPressed) || clear_orbits)
     {
-        orb_chunks.clear();
-        orb_ics[0].clear();
-        orb_ics[1].clear();
-        orb_pts[0].clear();
-        orb_pts[1].clear();
-        line_orb[0].clear();
-        line_orb[1].clear();
-
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
+        ClearSystemData();
+        clear_orbits = false;
     }
 
     // Clear zoom (total zoom out)
-    if (pge.GetKey(olc::Key::C).bPressed)
+    if (pge.GetKey(olc::Key::C).bPressed || clear_frame)
     {
+        sOffset = {0, 0};
         sPosScaleMin = sPosMin;
         sPosScaleMax = sPosMax;
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
+        sScale = {(sPosScaleMax.x - sPosScaleMin.x) / (double) cSize.x, 
+                  (sPosScaleMax.y - sPosScaleMin.y) / (double) cSize.y};
+        clear_frame = false;
     }
  
     // Draw zoom rectangle
-    if (pge.GetMouse(1).bPressed)
+    if (pge.GetMouse(1).bPressed && !line_hold)
     {
         cZoomFrameA.x = pge.GetMouseX();
         cZoomFrameA.y = pge.GetMouseY();
@@ -444,15 +632,16 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         cLinePosB.y = pge.GetMouseY();
         SetLinePtsToRun(pge);
         line_run = true;
+        line_hold = false;
     }
  
     // Increase points in Line of Init. Cond.
-    if (pge.GetMouseWheel() > 0 && line_hold)
+    if (line_hold && pge.GetMouseWheel() > 0)
     {
         line_pts += 1;
         if (line_pts > max_line_pts) { line_pts = max_line_pts; }
     }
-    else if (pge.GetMouseWheel() < 0 && line_hold)
+    else if (line_hold && pge.GetMouseWheel() < 0)
     {
         line_pts -= 1;
         if (line_pts < 0) { line_pts = 0; }
@@ -467,8 +656,6 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
     // Draw zoom rectangle or set new scale
     if (zoom_hold)
     {
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
         cZoomFrameB.x = pge.GetMouseX();
         cZoomFrameB.y = pge.GetMouseY();
         DrawZoomRect(pge);        
@@ -476,25 +663,18 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
     else if (zoom_set)
     {
         SetNewScale();
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
         zoom_set = false;
     }
 
     // Draw Line of Init. Cond.
     if (line_hold && !line_run)
     {
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
-        
         cLinePosB.x = pge.GetMouseX();
         cLinePosB.y = pge.GetMouseY();
         DrawPointLine(pge);
     }
     else if (line_quit && !line_run)
     {
-        pge.Clear(backgroundRGBA);
-        DrawOrbits(pge);
         line_quit = false;
     }
     else if (line_run)
@@ -502,5 +682,53 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         IterateLinePts(pge);
     }
 
+    // Print map name and mouse coordinate (TESTE)
+    int nTextScale = 3;
+    pge.FillRect({0,  0}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::VERY_DARK_GREY);
+    pge.DrawLine({0, 8 * 3 * nTextScale}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::WHITE);
+    int nTextSize = map->check_id().size();
+    pge.DrawString({(pge.ScreenWidth() - nTextSize * 8 * nTextScale) / 2, 8 * nTextScale}, map->check_id(), olc::WHITE, nTextScale);
+
+    cPos = cMouse;
+    CanvasToSystem();
+    pge.FillRect({0, pge.ScreenHeight() - 16 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight()}, olc::VERY_DARK_GREY);
+    pge.DrawLine({0, pge.ScreenHeight() - 17 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight() - 17 * nTextScale}, olc::WHITE);
+    pge.DrawString({0, pge.ScreenHeight() - 16 * nTextScale}, "x = " + std::to_string(sPos.x), olc::WHITE, nTextScale);
+    pge.DrawString({0, pge.ScreenHeight() -  8 * nTextScale}, "y = " + std::to_string(sPos.y), olc::WHITE, nTextScale);
+
+    // Draw Menu
+    DrawMenu(pge);
+
+    if (run_color_canvas)
+    {
+        color_wheel.HandleColorWheel(pge, backgroundRGBA, run_color_canvas);
+    }
+
+    if (run_color_orbit)
+    {
+        color_wheel.HandleColorWheel(pge, pointRGBA, run_color_orbit);
+    }
+
+    if (set_night_mode)
+    {
+        backgroundRGBA = NightModeBackgroundRGBA;
+        pointRGBA = NightModePointRGBA;
+        bNightMode = true;
+        set_night_mode = false;
+    }
+    if (set_light_mode)
+    {
+        backgroundRGBA = LightModeBackgroundRGBA;
+        pointRGBA = LightModePointRGBA;
+        bNightMode = false;
+        set_light_mode = false;
+    }
+    
+    if (change_map)
+    {
+        change_map = false;
+        ClearSystemData();
+        return set_map_ID;
+    }
     return RUN_2DMAP;
 }

@@ -40,25 +40,25 @@ and more.
 </p>
 
 ### Commands
-Features from the 2D map can be used from a local menu (M open it, arrow key to navigate, ENTER to select 
-and Z to return) or from key commands:
+Features from the 2D map can be used from a local menu (`M` open it, arrow key to navigate, `ENTER` to select 
+and `Z` to return) or from key commands:
 
-* Left click (hold): run orbit for clicked initial point
-* Right click: open zoom window 
-** (When zooming: Left click to set zoom)
-* C: total zoom out
-* X: delete last orbit
-* Ctrl + X: delete all orbits
-* Ctrl + S: Save all orbits (file in -> `results/map_name`)
-* Ctrl + Left Mouse (hold and drag): Pan around the screen
-* Scrool UP: Zoom in
-* Scrool DOWN: Zoom out
-* R: creates initial condition line
-* S: destroy initial condition line
-* SPACE: run dynamics for initial condition line points
-* Scrool UP|DOWN: increases|decreases the number of points in initial condition line
-* N: toggle night | light mode on and off.
-* D: Debug info
+* `Left click` (hold): run orbit for clicked initial point
+* `Right click`: open zoom window 
+* (When zooming: `Left click` to set zoom)
+* `C`: total zoom out
+* `X`: delete last orbit
+* `Ctrl + X`: delete all orbits
+* `Ctrl + S`: Save all orbits (file in -> `results/map_name`)
+* `Ctrl + Left Mouse` (hold and drag): Pan around the screen
+* `Scrool UP`: Zoom in
+* `Scrool DOWN`: Zoom out
+* `R`: creates initial condition line
+* `S`: destroy initial condition line
+* `SPACE`: run dynamics for initial condition line points
+* `Scrool UP|DOWN`: increases|decreases the number of points in initial condition line
+* `N`: toggle night | light mode on and off.
+* `D`: Debug info
 
 ## 1D maps
 
@@ -72,10 +72,10 @@ and Z to return) or from key commands:
 * Triangle
 
 ### Commands
-* Left click (hold): run cob web iteration
-* w: increase map parameter (par[0])
-* s: decrease map parameter (par[0])
-* 1-9: Iteration order `(f(f(...f(x))))`
+* `Left click` (hold): run cob web iteration
+* `w`: increase map parameter (par[0])
+* `s`: decrease map parameter (par[0])
+* `1-9`: Iteration order `(f(f(...f(x))))`
 
 <p float="center">
     <img src="files/img/demo-1d-map-logistic-O1.png" width=400>
@@ -88,10 +88,10 @@ A cellular automata model widely know as Game of Life from John Conway. The star
 allowing one to stop, edit, evolve it by single steps
 
 ### Commands
-* Space: pause|start iterations
-* (When paused) Left click: Give life to a cell
-* (When paused) Right click: Kill a cell
-* G: Toggle grid on|off
+* `Space`: pause|start iterations
+* (When paused) `Left click`: Give life to a cell
+* (When paused) `Right click`: Kill a cell
+* `G`: Toggle grid on|off
 
 <p float="center">
     <img src="files/img/demo-cellular-automata.png" width=400>

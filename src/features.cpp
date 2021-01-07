@@ -1,6 +1,6 @@
 #include "features.hpp"
 
-int Analysis::make_dir(string base_dir, string map_name)
+int Analysis::make_dir(std::string base_dir, std::string map_name)
 {
     /* Create folder (if not existent) */
     if (-1 == mkdir((base_dir).c_str(), 
@@ -10,7 +10,7 @@ int Analysis::make_dir(string base_dir, string map_name)
     }
     else
     {
-        cout << "Folder created " + base_dir << endl;
+        std::cout << "Folder created ./" + base_dir << std::endl;
     }
     
     if (-1 ==  mkdir((base_dir + map_name).c_str(),
@@ -20,13 +20,14 @@ int Analysis::make_dir(string base_dir, string map_name)
     }
     else 
     {
-        cout << "Folder created " + base_dir + map_name << endl;
+        std::cout << "Folder created ./" + base_dir + map_name << std::endl;
     }
     
     return 0;
 }
 
-int Analysis::make_file(FILE **fout1, FILE **fout2, string dir, string anal_type)
+int Analysis::make_file(FILE **fout1, FILE **fout2, 
+                        std::string dir, std::string anal_type)
 {
     *fout1 = fopen((dir + "/" + anal_type + ".dat").c_str(), "w");
     *fout2 = fopen((dir + "/" + anal_type + "_ic.dat").c_str(), "w");
@@ -41,8 +42,8 @@ int Analysis::orbit_1d(Maps_1d* map)
      *        FILE: Initial condition (map_id/orbit_ic.dat)
      **/
     FILE *fout1, *fout2;
-    string base_dir = "results/";
-    string fl_type = "orbit";
+    std::string base_dir = "results/";
+    std::string fl_type = "orbit";
 
     make_dir(base_dir, map->check_id());
     make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
@@ -58,6 +59,7 @@ int Analysis::orbit_1d(Maps_1d* map)
 
     fclose(fout1);
     fclose(fout2);
+    
     return 0;
 }
 
@@ -69,8 +71,8 @@ int Analysis::orbit_2d(Maps_2d* map)
     *         FILE: Initial condition (map_id/orbit_ic.dat)
     */ 
     FILE *fout1, *fout2;
-    string base_dir = "results/";
-    string fl_type = "orbit";
+    std::string base_dir = "results/";
+    std::string fl_type = "orbit";
 
     make_dir(base_dir, map->check_id());
     make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
@@ -89,6 +91,7 @@ int Analysis::orbit_2d(Maps_2d* map)
 
     fclose(fout1);
     fclose(fout2);
+    
     return 0;
 }
 
@@ -100,8 +103,8 @@ int Analysis::phase_space_2d(Maps_2d* map)
     *         FILE: Set of initial conditions (map_id/phase_space_ic.dat)
     */
     FILE *fout1, *fout2;
-    string base_dir = "results/";
-    string fl_type = "phase_space";
+    std::string base_dir = "results/";
+    std::string fl_type = "phase_space";
 
     make_dir(base_dir, map->check_id());
     make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
@@ -134,6 +137,7 @@ int Analysis::phase_space_2d(Maps_2d* map)
 
 	fclose(fout1);
     fclose(fout2);
+    
     return 0;
 }
 
@@ -146,8 +150,8 @@ int Analysis::winding_number(Maps_2d *map)
     *         FILE: Set of initial conditions (tt0, J) (map_id/winding_ic.dat)
     */
     FILE *fout1, *fout2;
-    string base_dir = "results/";
-    string fl_type = "winding";
+    std::string base_dir = "results/";
+    std::string fl_type = "winding";
 
     make_dir(base_dir, map->check_id());
     make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);
@@ -184,14 +188,14 @@ int Analysis::winding_number(Maps_2d *map)
     }
 
     map->mod = true;
-    fclose(fout1);
-    fclose(fout2);
+    std::fclose(fout1);
+    std::fclose(fout2);
     
     return 0;
 }
 
-int Analysis::save_orbit(Maps_2d *map, vector<vector<double>> orbit_pts, 
-                         vector<vector<double>> orbit_ics)
+int Analysis::save_orbit(Maps_2d *map, std::vector<std::vector<double>> orbit_pts, 
+                                       std::vector<std::vector<double>> orbit_ics)
 {
     /**
     * Receives a vector of 2D coordinates of an orbit and 
@@ -201,8 +205,8 @@ int Analysis::save_orbit(Maps_2d *map, vector<vector<double>> orbit_pts,
     *         FILE: Initial condition (map_id/convas_orbit_ic.dat)
     */ 
     FILE *fout1, *fout2;
-    string base_dir = "results/";
-    string fl_type = "canvas_orbit";
+    std::string base_dir = "results/";
+    std::string fl_type = "canvas_orbit";
 
     make_dir(base_dir, map->check_id());
     make_file(&fout1, &fout2, base_dir + map->check_id(), fl_type);

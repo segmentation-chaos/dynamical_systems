@@ -112,6 +112,7 @@ int Sfum_map::evolve()
     return 0;
 }
 
+
 int Log_map::evolve()
 {
     /**
@@ -122,8 +123,11 @@ int Log_map::evolve()
      * Domain: x -> (0.0, 1.0) 
      *         a -> [1, 4] (for non-trivial dynamic behavior)
      **/
-
-    out = par[0] * in * (1.0 - in);
+    for (int i = 1; i <= iter_order; i += 1)
+    {
+        out = par[0] * in * (1.0 - in);
+        if (i != iter_order) { in = out; }
+    }
 
     return 0;
 }
@@ -139,8 +143,11 @@ int Log_map_2ndO::evolve()
      * Domain: x -> (0.0, 1.0) 
      *         a -> [1, 4] (for non-trivial dynamic behavior)
      **/
-
-    out = par[0] * (par[0] * in * (1.0 - in)) * (1.0 - par[0] * in * (1.0 - in));
+    for (int i = 1; i <= iter_order; i += 1)
+    {
+        out = par[0] * (par[0] * in * (1.0 - in)) * (1.0 - par[0] * in * (1.0 - in));
+        if (i != iter_order) { in = out; }
+    }
     
     return 0;
 }
@@ -155,7 +162,11 @@ int Moran_map::evolve()
      * Domain: x -> (0.0, 1.0)
      *         r -> [0, inf]
      **/
-    out = in * exp(par[0] * (1.0 - in));
+    for (int i = 1; i <= iter_order; i += 1)
+    {
+        out = in * exp(par[0] * (1.0 - in));
+        if (i != iter_order) { in = out; }
+    }
 
     return 0;
 }
@@ -171,7 +182,11 @@ int Triang_map::evolve()
      * Domain: x -> (0.0, 1.0)
      *         a -> [0, 2.0]
      **/
-    out = (in < 0.5) ? par[0] * in : par[0] * (1.0 - in);
+    for (int i = 1; i <= iter_order; i += 1)
+    {
+        out = (in < 0.5) ? par[0] * in : par[0] * (1.0 - in);
+        if (i != iter_order) { in = out; }
+    }
     
     return 0;
 }
@@ -186,35 +201,42 @@ int Lin_sin_map::evolve()
      * Domain: x -> (0.0, 1.0)
      *         w -> [0, inf]
      **/
-    out = 0.5 * (in + sin(par[0] * in));
+    for (int i = 1; i <= iter_order; i += 1)
+    {
+        out = in + 0.1 * sin(par[0] * in);
+        if (i != iter_order) { in = out; }
+    }
 
     return 0;
 }
+
 
 int Log_map::set_par(double new_par)
 {
     par[0] = new_par;
     return 0;
 }
+
 int Log_map_2ndO::set_par(double new_par)
 {
     par[0] = new_par;
-
     return 0;
 }
+
 int Moran_map::set_par(double new_par)
 {
     par[0] = new_par;
     return 0;
 }
+
 int Triang_map::set_par(double new_par)
 {
     par[0] = new_par;
     return 0;
 }
+
 int Lin_sin_map::set_par(double new_par)
 {
     par[0] = new_par;
-
     return 0;
 }

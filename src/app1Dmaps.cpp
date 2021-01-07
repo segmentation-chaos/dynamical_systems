@@ -190,13 +190,25 @@ void app1DMap::DrawCobWeb(olc::PixelGameEngine& pge)
     }
 }
 
+void app1DMap::DrawGUI(olc::PixelGameEngine& pge)
+{
+    // Print map name
+    int nTextScale = 3;
+    pge.FillRect({0,  0}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::VERY_DARK_GREY);
+    pge.DrawLine({0, 8 * 3 * nTextScale}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::WHITE);
+    std::string sText = map->check_id() + " (" + std::to_string(map->get_iter_order()) + " order)";
+    int nTextSize = sText.size();
+    pge.DrawString({(pge.ScreenWidth() - nTextSize * 8 * nTextScale) / 2, 8 * nTextScale}, sText, olc::WHITE, nTextScale);
+}
+
 int app1DMap::run_frame(olc::PixelGameEngine& pge)
 {
     pge.Clear(olc::WHITE);
     DrawIdentity(pge);
     DrawAxes(pge);
     DrawFunction(pge);
-    pge.DrawString(20, 20, map->check_id() + " (" + std::to_string(map->get_iter_order()) + " order)", olc::BLACK, 2);
+    DrawGUI(pge);
+    // pge.DrawString(20, 20, map->check_id() + " (" + std::to_string(map->get_iter_order()) + " order)", olc::BLACK, 2);
 
     /* Handle Key events */
     // Return to menu

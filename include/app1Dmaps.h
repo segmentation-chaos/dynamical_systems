@@ -28,6 +28,7 @@ private:
     void DrawIdentity(olc::PixelGameEngine& pge);
     void DrawCobWeb(olc::PixelGameEngine& pge);
     void DrawAxes(olc::PixelGameEngine& pge);
+    void DrawGUI(olc::PixelGameEngine& pge);
 
     // Calculation limits
     double fWorldPerScreenWidthPixel;

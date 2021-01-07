@@ -17,7 +17,7 @@ DEPENDENCIES=main.cpp olcPixelGameEngine.cpp clickspace.cpp\
 			 appCellularAutomata.cpp colorwheel.cpp
 
 # Executable
-TARGETS=click_space
+TARGETS=dynamical_systems
 
 build: $(TARGETS)
 

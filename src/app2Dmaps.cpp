@@ -105,6 +105,7 @@ void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
     orb_ics.resize(2, std::vector<double>(0));
     orb_pts.resize(2, std::vector<double>(0));
     line_orb.resize(2, std::vector<double>(0));
+    orb_colors.resize(0);
 
     // Create local menu
     local_menu.sprGFX = new olc::Sprite("./files/sprites/RetroMenuSprite.png");
@@ -121,11 +122,6 @@ void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
     localMenuSetColor["Set Nightmode"].SetID(LOCAL_2DMAP_SETCOLOR_NIGHTMODE);
     localMenuSetColor["Set Lightmode"].SetID(LOCAL_2DMAP_SETCOLOR_LIGHTMODE);
     
-    localMenuMain["Set Parameter"].SetID(LOCAL_2DMAP_SETPARAMETER).Enable(false);
-    localMenuMain["Set Point"].SetID(LOCAL_2DMAP_SETPOINT).Enable(false);
-    localMenuMain["Set Axis"].SetID(LOCAL_2DMAP_SETAXIS).Enable(false);
-    localMenuMain["Set Grid"].SetID(LOCAL_2DMAP_SETGRID).Enable(false);
-    
     localMenuMain["Set Map"].SetID(LOCAL_2DMAP_SETMAP).SetTable(1, 2);
     auto& localMenuSetMap = localMenuMain["Set Map"];
     localMenuSetMap["Custom Map"].SetID(LOCAL_2DMAP_SETCUSTOMMAP).Enable(false);
@@ -136,6 +132,11 @@ void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
     localMenuSetMapLibrary["Henon"].SetID(SET_2DMAP_HENON);
     localMenuSetMapLibrary["Standard"].SetID(SET_2DMAP_STANDARD);
     localMenuSetMapLibrary["Standard Non-Twist"].SetID(SET_2DMAP_STDNONTWST);
+
+    localMenuMain["Set Parameter"].SetID(LOCAL_2DMAP_SETPARAMETER).Enable(false);
+    localMenuMain["Set Point"].SetID(LOCAL_2DMAP_SETPOINT).Enable(false);
+    localMenuMain["Set Axis"].SetID(LOCAL_2DMAP_SETAXIS).Enable(false);
+    localMenuMain["Set Grid"].SetID(LOCAL_2DMAP_SETGRID).Enable(false);
     
     localMenuMain["Controls"].SetID(LOCAL_2DMAP_CONTROLS).Enable(false);
     localMenuMain["Center Frame"].SetID(LOCAL_2DMAP_CLEAR_FRAME);
@@ -146,12 +147,11 @@ void app2DMap::SetApplication(olc::PixelGameEngine& pge, int32_t command_id)
 
     local_menu.mo.Build();
     local_menu.mm.Open(&local_menu.mo["main"]);
-    
-    pge.SetPixelMode(olc::Pixel::NORMAL);
 
+    pge.SetPixelMode(olc::Pixel::NORMAL);
     pointRGBA = { 255, 255, 255, 255};
     backgroundRGBA = { 50,  50,  55, 255};
-    color_wheel.SetColorWheel(150, olc::vi2d{0, 300});
+    color_wheel.SetColorWheel(150, olc::vi2d{5, 500});
 }
 
 void app2DMap::CanvasToSystem()
@@ -285,7 +285,7 @@ void app2DMap::DrawOrbits(olc::PixelGameEngine& pge)
         sPos.y = orb_pts[1][i];
 
         SystemToCanvas();
-        pge.Draw(cPos, pointRGBA);
+        pge.Draw(cPos, orb_colors[i]);
     }
 }
 
@@ -293,6 +293,27 @@ void app2DMap::DrawMenu(olc::PixelGameEngine& pge)
 {
     // Draw Menu
     local_menu.mm.Draw(pge, local_menu.sprGFX, {40, 20});
+}
+
+void app2DMap::DrawGUI(olc::PixelGameEngine& pge, olc::vi2d cMouse)
+{
+    // Print map name
+    int nTextScale = 3;
+    pge.FillRect({0,  0}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::VERY_DARK_GREY);
+    pge.DrawLine({0, 8 * 3 * nTextScale}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::WHITE);
+    int nTextSize = map->check_id().size();
+    pge.DrawString({(pge.ScreenWidth() - nTextSize * 8 * nTextScale) / 2, 8 * nTextScale}, map->check_id(), olc::WHITE, nTextScale);
+
+    // Print mouse position (system coordinates)
+    cPos = cMouse;
+    CanvasToSystem();
+    pge.FillRect({0, pge.ScreenHeight() - 16 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight()}, olc::VERY_DARK_GREY);
+    pge.DrawLine({0, pge.ScreenHeight() - 17 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight() - 17 * nTextScale}, olc::WHITE);
+    pge.DrawString({0, pge.ScreenHeight() - 16 * nTextScale}, "x = " + std::to_string(sPos.x), olc::WHITE, nTextScale);
+    pge.DrawString({0, pge.ScreenHeight() -  8 * nTextScale}, "y = " + std::to_string(sPos.y), olc::WHITE, nTextScale);
+
+    // Draw Menu
+    DrawMenu(pge);
 }
 
 void app2DMap::IterateMapOnClick(olc::PixelGameEngine& pge)
@@ -306,11 +327,13 @@ void app2DMap::IterateMapOnClick(olc::PixelGameEngine& pge)
 
     orb_pts[0].push_back(sPos.x);
     orb_pts[1].push_back(sPos.y);
+    orb_colors.push_back(pointRGBA);
 
     map->in[0] = map->out[0];
     map->in[1] = map->out[1];
 
     orb_size += 1;
+    total_points += 1;
     orb_chunks.back() = orb_size;
 }
 
@@ -333,6 +356,9 @@ void app2DMap::IterateLinePts(olc::PixelGameEngine& pge)
             orb_pts[1].push_back(sPos.y);
             line_orb[0][p] = sPos.x;
             line_orb[1][p] = sPos.y;
+
+            total_points += 1;
+            orb_colors.push_back(pointRGBA);
         }
         orb_size += line_orb[0].size();
         orb_chunks.back() = orb_size;
@@ -342,8 +368,6 @@ void app2DMap::IterateLinePts(olc::PixelGameEngine& pge)
     {
         line_orb[0].clear();
         line_orb[1].clear();
-        // pge.Clear(backgroundRGBA);
-        // DrawOrbits(pge);
             
         line_iter = 0;
         line_run  = false;
@@ -372,6 +396,7 @@ void app2DMap::SetLinePtsToRun(olc::PixelGameEngine& pge)
             line_orb[1].push_back(sPos.y);
                 
             orb_size += 1;
+            total_points += 1;
         }
     }
     else if (line_pts == 0)
@@ -391,6 +416,7 @@ void app2DMap::SetLinePtsToRun(olc::PixelGameEngine& pge)
         line_orb[1].push_back(sPos.y);
  
         orb_size = 2;
+        total_points += 2;
     }
 
     orb_chunks.push_back(orb_size);
@@ -398,6 +424,7 @@ void app2DMap::SetLinePtsToRun(olc::PixelGameEngine& pge)
 
 void app2DMap::ClearSystemData()
 {
+    orb_colors.clear();
     orb_chunks.clear();
     orb_ics[0].clear();
     orb_ics[1].clear();
@@ -405,6 +432,32 @@ void app2DMap::ClearSystemData()
     orb_pts[1].clear();
     line_orb[0].clear();
     line_orb[1].clear();
+    total_points = 0;
+}
+
+void app2DMap::DebugInfo(olc::PixelGameEngine& pge)
+{
+    olc::vi2d vFramePos = {2 * pge.ScreenWidth() / 3, 200};
+    olc::vi2d vFrameSize = {pge.ScreenWidth() / 3, 600};
+    // olc::Pixel::Mode currentPixelMode = pge.GetPixelMode();
+    // pge.SetPixelMode(olc::Pixel::ALPHA);    
+    pge.FillRect(vFramePos, vFrameSize, { 30,  30,  30, 150});
+    pge.DrawRect(vFramePos, vFrameSize, {255, 255, 255, 200});
+    // pge.SetPixelMode(currentPixelMode);
+
+    float fElapsedTime = pge.GetElapsedTime();
+    int nTextSize = 2;
+    olc::Pixel pTextColor = olc::WHITE;
+    pge.DrawString(vFramePos + olc::vi2d{10,  10}, "fElapsedTime = " + std::to_string(fElapsedTime), pTextColor, nTextSize);
+    pge.DrawString(vFramePos + olc::vi2d{10,  30}, "Points = " + std::to_string(total_points),  pTextColor, nTextSize);
+    pge.DrawString(vFramePos + olc::vi2d{10,  50}, "x_min = " + std::to_string(sPosScaleMin.x), pTextColor, nTextSize);
+    pge.DrawString(vFramePos + olc::vi2d{10,  70}, "y_min = " + std::to_string(sPosScaleMin.y), pTextColor, nTextSize);
+    pge.DrawString(vFramePos + olc::vi2d{10,  90}, "x_max = " + std::to_string(sPosScaleMax.x), pTextColor, nTextSize);
+    pge.DrawString(vFramePos + olc::vi2d{10, 110}, "y_max = " + std::to_string(sPosScaleMax.y), pTextColor, nTextSize);
+    std::string sMouseStatus = pge.GetMouse(0).bHeld ? "Hold" : 
+                              (pge.GetMouse(0).bPressed ? "Pressed" : 
+                              (pge.GetMouse(0).bReleased ? "Released" : "Free"));
+    pge.DrawString(vFramePos + olc::vi2d{10, 130}, "Mouse(L): " + sMouseStatus, pTextColor, nTextSize);
 }
 
 void app2DMap::HandleLocalMenu(olc::PixelGameEngine& pge)
@@ -477,6 +530,12 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
     DrawOrbits(pge);
     HandleLocalMenu(pge);
 
+    // Start timing
+    auto tp1 = std::chrono::high_resolution_clock::now();
+
+    // Turn On|Off debug info
+    if (pge.GetKey(olc::Key::D).bPressed) { debug = !debug; }
+
     // Return to main menu
     if (pge.GetKey(olc::Key::ESCAPE).bPressed || quit) 
     {
@@ -536,12 +595,14 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         orb_pts[0].push_back(sPos.x);
         orb_pts[1].push_back(sPos.y);
         orb_chunks.push_back(1);
+        orb_colors.push_back(pointRGBA);
         orb_size = 1;
 
         map->in[0] = sPos.x;
         map->in[1] = sPos.y;
 
         run_dynamics = true;
+        total_points += 1;
     }
     else if (pge.GetMouse(0).bHeld && !pge.GetKey(olc::Key::CTRL).bHeld &&
              !line_hold && !run_color_orbit && !run_color_canvas)
@@ -573,11 +634,15 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         {
             orb_pts[0].resize(orb_pts[0].size() - orb_chunks.back());
             orb_pts[1].resize(orb_pts[1].size() - orb_chunks.back());
+            orb_colors.resize(orb_colors.size() - orb_chunks.back());
+            total_points -= orb_chunks.back();
         }
         else if ((int) orb_pts[0].size() <= orb_chunks.back())
         {
             orb_pts[0].resize(0);
             orb_pts[1].resize(0);
+            orb_colors.resize(0);
+            total_points = 0;
         }
     }
 
@@ -682,22 +747,8 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         IterateLinePts(pge);
     }
 
-    // Print map name and mouse coordinate (TESTE)
-    int nTextScale = 3;
-    pge.FillRect({0,  0}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::VERY_DARK_GREY);
-    pge.DrawLine({0, 8 * 3 * nTextScale}, {pge.ScreenWidth(), 8 * 3 * nTextScale}, olc::WHITE);
-    int nTextSize = map->check_id().size();
-    pge.DrawString({(pge.ScreenWidth() - nTextSize * 8 * nTextScale) / 2, 8 * nTextScale}, map->check_id(), olc::WHITE, nTextScale);
-
-    cPos = cMouse;
-    CanvasToSystem();
-    pge.FillRect({0, pge.ScreenHeight() - 16 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight()}, olc::VERY_DARK_GREY);
-    pge.DrawLine({0, pge.ScreenHeight() - 17 * nTextScale}, {pge.ScreenWidth(), pge.ScreenHeight() - 17 * nTextScale}, olc::WHITE);
-    pge.DrawString({0, pge.ScreenHeight() - 16 * nTextScale}, "x = " + std::to_string(sPos.x), olc::WHITE, nTextScale);
-    pge.DrawString({0, pge.ScreenHeight() -  8 * nTextScale}, "y = " + std::to_string(sPos.y), olc::WHITE, nTextScale);
-
-    // Draw Menu
-    DrawMenu(pge);
+    // Draw Frame and Menu
+    DrawGUI(pge, cMouse);
 
     if (run_color_canvas)
     {
@@ -730,5 +781,12 @@ int app2DMap::run_frame(olc::PixelGameEngine& pge)
         ClearSystemData();
         return set_map_ID;
     }
+
+    // Stop timing
+    auto tp2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsedTime = tp2 - tp1;
+
+    if (debug) { DebugInfo(pge); }
+
     return RUN_2DMAP;
 }

@@ -22,6 +22,10 @@ private:
     // Relate a 2D map string name to an int ID
     std::unordered_map<int32_t, std::string> IDtable;
 
+    // Debug features
+    void DebugInfo(olc::PixelGameEngine& pge);
+    bool debug = false;
+
     // Local Menu
     RetroMenu local_menu;
     void HandleLocalMenu(olc::PixelGameEngine& pge);
@@ -37,6 +41,7 @@ private:
     void DrawPhasePoint(olc::PixelGameEngine& pge);
     void DrawPointLine(olc::PixelGameEngine& pge);
     void DrawZoomRect(olc::PixelGameEngine& pge);
+    void DrawGUI(olc::PixelGameEngine& pge, olc::vi2d cMouse);
 
     // Dynamics functions
     void IterateMapOnClick(olc::PixelGameEngine& pge);
@@ -45,11 +50,13 @@ private:
     void ClearSystemData();
 
     // Orbit points
-    long unsigned int orb_size;
+    unsigned int total_points = 0;
+    unsigned int orb_size;
     std::vector<int> orb_chunks;
     std::vector<std::vector<double>> orb_ics;
     std::vector<std::vector<double>> orb_pts;
     std::vector<std::vector<double>> line_orb;
+    std::vector<olc::Pixel> orb_colors;
 
     // Canvas coordinates
     olc::vi2d cPos;
@@ -99,12 +106,11 @@ private:
     int set_map_ID = RUN_2DMAP;
     bool change_map = false;
 
-
     // Limits settings        
     int line_pts = 0;
     int max_line_pts = 50;
     int line_iter = 0;
-    int line_iter_max = 500;
+    int line_iter_max = 700;
 
     // Drawing colors
     olc::Pixel lineRGBA = {255, 0, 0, 255};
@@ -115,8 +121,8 @@ private:
     ColorWheel color_wheel;
     olc::Pixel pointRGBA = { 255, 255, 255, 255};
     olc::Pixel backgroundRGBA = { 50,  50,  55, 255};
-    olc::Pixel NightModeBackgroundRGBA = { 50,  50,  55, 255};
-    olc::Pixel LightModeBackgroundRGBA = {255, 255, 255, 255};
     olc::Pixel NightModePointRGBA = {255, 255, 255, 255};
     olc::Pixel LightModePointRGBA = { 10,  10,  10, 255};
+    olc::Pixel NightModeBackgroundRGBA = { 50,  50,  55, 255};
+    olc::Pixel LightModeBackgroundRGBA = {255, 255, 255, 255};
 };

@@ -10,8 +10,8 @@
 class Analysis
 {
     private:
-        int make_dir(string, string);
-        int make_file(FILE**, FILE**, string, string);
+        int make_dir(std::string, std::string);
+        int make_file(FILE**, FILE**, std::string, std::string);
         
     public:
         int iter_num;
@@ -24,8 +24,8 @@ class Analysis
         int winding_number(Maps_2d*);
 
         int save_orbit(Maps_2d *map, 
-                       vector<vector<double>> orbit_pts, 
-                       vector<vector<double>> orbit_ics);
+                       std::vector<std::vector<double>> orbit_pts, 
+                       std::vector<std::vector<double>> orbit_ics);
 };
 
 #endif

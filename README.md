@@ -91,6 +91,7 @@ allowing one to stop, edit, evolve it by single steps
 * `Space`: pause|start iterations
 * (When paused) `Left click`: Give life to a cell
 * (When paused) `Right click`: Kill a cell
+* (When paused) `Right key`: Evolve a single iteration
 * `G`: Toggle grid on|off
 
 <p float="center">
